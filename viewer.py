@@ -13,6 +13,8 @@ import pygame-menu
 """
 running = False
 
+import threading, time
+
 class Viewer:
 
     def github(self):
@@ -99,10 +101,12 @@ class Viewer:
         self.algorithm = value
 
     def main_background(self):
-
         self.screen.fill(white)
 
     def print_array(self, name):
+        print("V attempts to acquire")
+        self.controller.lock.acquire()
+        print("V acquired")
         fis = open(name, "r")
         n = int(fis.readline())
         startX = 0
@@ -126,19 +130,22 @@ class Viewer:
             self.screen.blit(text, textRect)
             self.arrList.append((rect, textRect, text, info['color']))
         pygame.display.flip()
+        self.controller.lock.release()
+        print("V released")
             
     def add_element(self, x):
-        self.controller.add_element(x)
         self.menuRunning = False
-        self.running = False
+        self.running     = False
+        self.controller.add_element(x, 123)
 
-    def do_nothing(self):
-        pass
-
-    def start_algorithm(self):
+    def start_algorithm(self, meniu):
         self.menuRunning = False
-        self.running = False
+        self.running     = False
+        self.delete_menu(meniu) # peticeala, dar n-am vreo idee mai buna. comenteaza si vezi ce se intampla
         self.controller.trigger_play()
+
+    def test(self):
+        pass
 
     def event_handler(self):
         events = pygame.event.get()
@@ -156,8 +163,9 @@ class Viewer:
                         meniu.add_button("Adauga inaintea elementului", self.add_element,  i)
                         meniu.add_button("Adauga dupa element", self.add_element, i + 1)
                         meniu.add_button("Cancel", self.delete_menu, meniu)
-                        meniu.add_button("Start algorithm", self.start_algorithm)
+                        meniu.add_button("Start algorithm", self.start_algorithm, meniu)
                         self.run_menu(meniu)
+                        return True
 
         return True
 
@@ -169,17 +177,15 @@ class Viewer:
         posi = meniu.get_position()
         rect = pygame.Rect(posi[0], posi[1], posi[2] - posi[0], posi[3] - posi[1])
         pygame.draw.rect(self.screen, white, rect, 0)
-  
       
 
     def close(self):
         pygame.quit()
 
-
-if __name__ == "__main__":
-    v = Viewer(None)
-    v.print_array('test.txt')
-    v.running = True
-    while (v.running == True):
-        v.event_handler()
-    v.close()
+    def loop(self, filename):
+        print("visualizer called")
+        self.print_array(filename)
+        self.running = True
+        while (self.running == True):
+            self.event_handler()
+        print("exited visualize loop")
