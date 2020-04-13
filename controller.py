@@ -87,12 +87,15 @@ class Controller:
 		V.join()
 		self.lock.reset()
 
+	def pause(self):
+		pass
+
 	def array_worker(self):
 		while (self.lock.get_state() == True):
-			self.viewer.event_handler()
-			self.viewer.print_array(self.filename)
+			self.viewer.event_handler(False)
+			self.viewer.print_array(self.filename, False)
 
 	def visualize(self):
 		while (True):
-			self.viewer.loop(self.filename)
-			self.viewer.event_handler()
+			self.viewer.loop(self.filename, False)
+			self.viewer.event_handler(False)
