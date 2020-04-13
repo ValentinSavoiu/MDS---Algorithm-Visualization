@@ -5,13 +5,13 @@ import pygameMenu
 import pygameMenu.events
 import ast
 import webbrowser  
+import os
 """
 import ast
 import webbrowser
 import pygame
 import pygame-menu
 """
-running = False
 
 import threading, time
 
@@ -64,6 +64,7 @@ class Viewer:
 
     def __init__(self, c):
         self.controller = c
+        self.changeable = True
         pygame.init()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.width, self.height = pygame.display.get_surface().get_size()
@@ -81,8 +82,8 @@ class Viewer:
         meniu.set_fps(60)
         self.run_menu(meniu)
         
-    def remove_element(self):
-        self.controller.remove_element(i)
+    def remove_element(self, x):
+        self.controller.remove_element(x)
         self.menuRunning = false
         self.running = false
 
@@ -103,7 +104,7 @@ class Viewer:
     def main_background(self):
         self.screen.fill(white)
 
-    def print_array(self, name):
+    def print_array(self, name, algRunning):
         print("V attempts to acquire")
         self.controller.lock.acquire()
         print("V acquired")
@@ -129,48 +130,65 @@ class Viewer:
             pygame.draw.rect(self.screen, black,  rect, 1)
             self.screen.blit(text, textRect)
             self.arrList.append((rect, textRect, text, info['color']))
+        
+        imgName = 'play_medium.png' if algRunning == False else 'pause_medium.png'
+        img = pygame.image.load(os.path.join('icons', imgName))
+        self.pausePlay = pygame.Rect(int(0.9 * self.height - img.get_height()), int(self.width // 2 - img.get_width() // 2), img.get_height(), img.get_width())
+        self.screen.blit(img, (int(0.9 * self.height - img.get_height()), int(self.width // 2 - img.get_width())))
         pygame.display.flip()
         self.controller.lock.release()
         print("V released")
             
-    def add_element(self, x):
+    def add_element(self, val, pos):
         self.menuRunning = False
         self.running     = False
-        self.controller.add_element(x, 123)
+        self.controller.add_element(val, pos)
 
     def start_algorithm(self, meniu):
         self.menuRunning = False
         self.running     = False
+        self.changeable  = False
         self.delete_menu(meniu) # peticeala, dar n-am vreo idee mai buna. comenteaza si vezi ce se intampla
         self.controller.trigger_play()
 
     def test(self):
         pass
 
-    def event_handler(self):
+    def event_handler(self, algRunning):
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                self.running = False
                 return False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 posi = event.pos
+                if self.pausePlay.collidepoint(posi) :
+                    print("HELLO")
+                    if algRunning == True:
+                        self.controller.pause()
+                    else:
+                        self.controller.trigger_play()
+                    return True
+
+                if self.changeable == False:
+                    continue
                 for i in range(len(self.arrList)):
                     (rect, textRect, text, color) = self.arrList[i]
                     if rect.collidepoint(posi):
                         meniu = self.make_menu(500, 400, fs = 20)
-                        meniu.add_button("Sterge element", self.remove_element)
+                        self.value = 0
+                        meniu.add_button("Sterge element", self.remove_element, i)
                         meniu.add_text_input("Valoare:", default = '0', onreturn=self.set_value)
-                        meniu.add_button("Adauga inaintea elementului", self.add_element,  i)
-                        meniu.add_button("Adauga dupa element", self.add_element, i + 1)
+                        meniu.add_button("Adauga inaintea elementului", self.add_element,  i, self.value)
+                        meniu.add_button("Adauga dupa element", self.add_element, i + 1, self.value)
                         meniu.add_button("Cancel", self.delete_menu, meniu)
-                        meniu.add_button("Start algorithm", self.start_algorithm, meniu)
+                        #meniu.add_button("Start algorithm", self.start_algorithm, meniu)
                         self.run_menu(meniu)
                         return True
 
         return True
 
     def delete_menu(self, meniu):
-        print ("HELLO")
         meniu.disable()
         meniu.clear()
         self.menuRunning = False
@@ -182,10 +200,10 @@ class Viewer:
     def close(self):
         pygame.quit()
 
-    def loop(self, filename):
+    def loop(self, filename, algRunning):
         print("visualizer called")
-        self.print_array(filename)
+        self.print_array(filename, True)
         self.running = True
         while (self.running == True):
-            self.event_handler()
+            self.event_handler(algRunning)
         print("exited visualize loop")
