@@ -202,7 +202,7 @@ class Viewer:
 
     def loop(self, filename, algRunning):
         print("visualizer called")
-        self.print_array(filename, True)
+        self.print_array(filename, algRunning)
         self.running = True
         while (self.running == True):
             self.event_handler(algRunning)
