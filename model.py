@@ -9,16 +9,36 @@ class Graph(DataStructure):
 class Vector(DataStructure):
 	def __init__(self, filename):
 		DataStructure.__init__(self, filename)
-
-	def add_element(self, a, b):
-		file = open(self.filename, "r+")
-		old = file.readlines()
-		file.seek(0)
-		olds = str()
-		for i in range(1,len(old)):
-			olds += old[i]
-		old[0] = str(int(old[0]) + 1)
-		file.write(old[0] + "\n{'content':" + str(i) + ", 'color':(100, 100, 100)}\n" + olds)
+		file = open(self.filename,"r")
+		lines = file.readlines()
+		self.sz = int(lines[0][0:1])
+		self.list = []
+		for i in range(1,len(lines)):
+			value = 0
+			j = 11
+			print(lines[i])
+			while lines[i][j].isdigit():
+				value = value * 10 + int(lines[i][j])
+				j = j + 1
+			self.list.append(value)
+		file.close()
+  
+	def remove_element(self,id):
+		del self.list[id]
+		self.sz = self.sz - 1
+		file = open(self.filename,"w")
+		file.write(str(self.sz)+"\n")
+		for i in range(self.sz):
+			file.write("{'content':" + str(self.list[i]) + ", 'color':(100,100,100)}\n")
+		file.close()
+	
+	def add_element(self,value,position):
+		self.list.insert(position,value)
+		self.sz = self.sz + 1
+		file = open(self.filename,"w")
+		file.write(str(self.sz)+"\n")
+		for i in range(self.sz):
+			file.write("{'content':" + str(self.list[i]) + ", 'color':(100,100,100)}\n")
 		file.close()
 
 class Algorithm:
@@ -32,10 +52,38 @@ class BubbleSort(Algorithm):
 		self.DS = Vector(filename)
 
 	def execute(self):
-		for i in range(10):
-			print("M tries to acquire")
-			self.controller.lock.acquire()
-			print("M acquired")
-			self.DS.add_element(i, 2)
-			self.controller.lock.release()
-			print("M released")
+		ok = 0
+		while ok == 0:
+			ok = 1
+			for j in range(self.DS.sz-1):
+				self.controller.lock.acquire()
+				file = open(self.DS.filename,"w")
+				file.write(str(self.DS.sz)+"\n")
+				for k in range(j):
+					file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
+				file.write("{'content':" + str(self.DS.list[j]) + ", 'color':(255,0,0)}\n")
+				file.write("{'content':" + str(self.DS.list[j+1]) + ", 'color':(255,0,0)}\n")
+				for k in range(j+2,self.DS.sz):
+					file.write("{'content': " + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
+				file.close()
+				self.controller.lock.release()
+				if self.DS.list[j] > self.DS.list[j+1]:
+					self.controller.lock.acquire()
+					ok = 0
+					aux = self.DS.list[j];
+					self.DS.list[j] = self.DS.list[j+1]
+					self.DS.list[j+1] = aux
+					file = open(self.DS.filename,"w")
+					file.write(str(self.DS.sz)+"\n")
+					for k in range(self.DS.sz):
+						file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
+					file.close()
+					self.controller.lock.release()
+		self.controller.lock.acquire()
+		file = open(self.DS.filename,"w")
+		file.write(str(self.DS.sz)+"\n")
+		for k in range(self.DS.sz):
+			file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
+		file.close()
+		self.controller.lock.release()
+
