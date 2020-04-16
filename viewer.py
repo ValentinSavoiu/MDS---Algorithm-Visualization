@@ -126,8 +126,8 @@ class Viewer:
         
         imgName = 'play_medium.png' if algRunning == False else 'pause_medium.png'
         img = pygame.image.load(os.path.join('icons', imgName))
-        self.pausePlay = pygame.Rect(int(0.9 * self.height - img.get_height()), int(self.width // 2 - img.get_width() // 2), img.get_height(), img.get_width())
-        self.screen.blit(img, (int(0.9 * self.height - img.get_height()), int(self.width // 2 - img.get_width())))
+        self.pausePlay = pygame.Rect(int(self.width // 2 - img.get_width() // 2), int(0.9 * self.height - img.get_height()), img.get_width(), img.get_height())
+        self.screen.blit(img, self.pausePlay)
         pygame.display.flip()
         self.controller.lock.release()
         print("V released")
@@ -164,7 +164,6 @@ class Viewer:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 posi = event.pos
                 if self.pausePlay.collidepoint(posi) :
-                    print("HELLO")
                     if algRunning == True:
                         self.controller.pause()
                     else:
