@@ -87,14 +87,6 @@ class Viewer:
         self.menuRunning = False
         self.running = False
 
-    def set_value(self, text):
-        self.value = 0
-        try:
-            self.value = int(text)
-            print(self.value)
-        except Exception as e:
-            pass
-
     def choose_algorithm(self):
         self.menuRunning = False
         self.controller.choose_algorithm(self.algorithm)
@@ -140,9 +132,10 @@ class Viewer:
         self.controller.lock.release()
         print("V released")
             
-    def add_element(self, val, pos):
+    def add_element(self, meniu, pos):
         self.menuRunning = False
         self.running     = False
+        val = self.get_value(meniu)
         self.controller.add_element(val, pos)
 
     def start_algorithm(self, meniu):
@@ -154,6 +147,13 @@ class Viewer:
 
     def test(self):
         pass
+
+    def get_value(self, meniu):
+        try:
+            val = int(meniu.get_input_data()['val'])
+        except Exception as e:
+            val = 0
+        return val
 
     def event_handler(self, algRunning):
         events = pygame.event.get()
@@ -177,11 +177,10 @@ class Viewer:
                     (rect, textRect, text, color) = self.arrList[i]
                     if rect.collidepoint(posi):
                         meniu = self.make_menu(500, 400, fs = 20)
-                        self.value = 0
                         meniu.add_button("Sterge element", self.remove_element, i)
-                        meniu.add_text_input("Valoare:", default = '0', onreturn=self.set_value)
-                        meniu.add_button("Adauga inaintea elementului", self.add_element, self.value, i)
-                        meniu.add_button("Adauga dupa element", self.add_element, self.value, i + 1)
+                        meniu.add_text_input("Valoare:", default='0', textinput_id='val', input_type='__pygameMenu_input_int__')
+                        meniu.add_button("Adauga inaintea elementului", self.add_element, meniu, i)
+                        meniu.add_button("Adauga dupa element", self.add_element, meniu, i + 1)
                         meniu.add_button("Cancel", self.delete_menu, meniu)
                         #meniu.add_button("Start algorithm", self.start_algorithm, meniu)
                         self.run_menu(meniu)
