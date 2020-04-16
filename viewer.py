@@ -66,7 +66,7 @@ class Viewer:
         self.controller = c
         self.changeable = True
         pygame.init()
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((1000, 1000))
         self.width, self.height = pygame.display.get_surface().get_size()
         self.font = pygame.font.Font('freesansbold.ttf', 32)
         meniu = self.make_menu(bgfunn = self.main_background, dp = True)
@@ -84,13 +84,14 @@ class Viewer:
         
     def remove_element(self, x):
         self.controller.remove_element(x)
-        self.menuRunning = false
-        self.running = false
+        self.menuRunning = False
+        self.running = False
 
     def set_value(self, text):
         self.value = 0
         try:
             self.value = int(text)
+            print(self.value)
         except Exception as e:
             pass
 
@@ -179,8 +180,8 @@ class Viewer:
                         self.value = 0
                         meniu.add_button("Sterge element", self.remove_element, i)
                         meniu.add_text_input("Valoare:", default = '0', onreturn=self.set_value)
-                        meniu.add_button("Adauga inaintea elementului", self.add_element,  i, self.value)
-                        meniu.add_button("Adauga dupa element", self.add_element, i + 1, self.value)
+                        meniu.add_button("Adauga inaintea elementului", self.add_element, self.value, i)
+                        meniu.add_button("Adauga dupa element", self.add_element, self.value, i + 1)
                         meniu.add_button("Cancel", self.delete_menu, meniu)
                         #meniu.add_button("Start algorithm", self.start_algorithm, meniu)
                         self.run_menu(meniu)
