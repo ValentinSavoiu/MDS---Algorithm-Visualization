@@ -10,7 +10,7 @@ class SyncLock:
 		self.__state    = False
 		self.__delay	= 0.25
 
-	def change_delay(multiplier):
+	def change_delay(self, multiplier):
 		self.__delay    = self.__delay * multiplier
 
 	def set_last_thr(self, thr):
@@ -50,7 +50,7 @@ class Controller:
 		self.viewer   = Viewer(self)
 		self.lock     = SyncLock()
 	
-	def change_speed(multiplier):
+	def change_speed(self, multiplier):
 		self.lock.change_delay(multiplier)
 
 	def choose_algorithm(self, id):

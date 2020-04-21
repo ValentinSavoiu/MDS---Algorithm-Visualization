@@ -70,7 +70,7 @@ class BubbleSort(Algorithm):
 				if self.DS.list[j] > self.DS.list[j+1]:
 					self.controller.lock.acquire()
 					ok = 0
-					aux = self.DS.list[j];
+					aux = self.DS.list[j]
 					self.DS.list[j] = self.DS.list[j+1]
 					self.DS.list[j+1] = aux
 					file = open(self.DS.filename,"w")

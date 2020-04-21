@@ -97,6 +97,23 @@ class Viewer:
     def main_background(self):
         self.screen.fill(white)
 
+    def print_icons(self, algRunning):
+        imgName = 'play_medium.png' if algRunning == False else 'pause_medium.png'
+        img = pygame.image.load(os.path.join('icons', imgName))
+        self.pausePlay = pygame.Rect(int(self.width // 2 - img.get_width() // 2), int(0.9 * self.height - img.get_height()), img.get_width(), img.get_height())
+        self.screen.blit(img, self.pausePlay)
+
+        imgName = 'slow_medium.png'
+        img = pygame.image.load(os.path.join('icons', imgName))
+        self.slow = pygame.Rect(self.pausePlay.left - img.get_width(), self.pausePlay.top, img.get_width(), img.get_height())
+        self.screen.blit(img, self.slow)
+
+        imgName = 'fast_medium.png'
+        img = pygame.image.load(os.path.join('icons', imgName))
+        self.fast = pygame.Rect(self.pausePlay.right, self.pausePlay.top, img.get_width(), img.get_height())
+        self.screen.blit(img, self.fast)
+        
+
     def print_array(self, name, algRunning):
         print("V attempts to acquire")
         self.controller.lock.acquire()
@@ -123,11 +140,8 @@ class Viewer:
             pygame.draw.rect(self.screen, black,  rect, 1)
             self.screen.blit(text, textRect)
             self.arrList.append((rect, textRect, text, info['color']))
-        
-        imgName = 'play_medium.png' if algRunning == False else 'pause_medium.png'
-        img = pygame.image.load(os.path.join('icons', imgName))
-        self.pausePlay = pygame.Rect(int(self.width // 2 - img.get_width() // 2), int(0.9 * self.height - img.get_height()), img.get_width(), img.get_height())
-        self.screen.blit(img, self.pausePlay)
+
+        self.print_icons(algRunning)
         pygame.display.flip()
         self.controller.lock.release()
         print("V released")
@@ -169,6 +183,12 @@ class Viewer:
                     else:
                         self.controller.trigger_play()
                     return True
+
+                if self.fast.collidepoint(posi):
+                    self.controller.change_speed(0.75)
+                
+                if self.slow.collidepoint(posi):
+                    self.controller.change_speed(1.25)
 
                 if self.changeable == False:
                     continue
