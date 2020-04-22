@@ -115,9 +115,9 @@ class Viewer:
         
 
     def print_array(self, name, algRunning):
-        print("V attempts to acquire")
-        self.controller.lock.acquire()
-        print("V acquired")
+#        print("V attempts to acquire")
+#        self.controller.lock.acquire()
+#        print("V acquired")
         fis = open(name, "r")
         n = int(fis.readline())
         startX = 0
@@ -143,8 +143,8 @@ class Viewer:
 
         self.print_icons(algRunning)
         pygame.display.flip()
-        self.controller.lock.release()
-        print("V released")
+#        self.controller.lock.release()
+#        print("V released")
             
     def add_element(self, meniu, pos):
         self.menuRunning = False
@@ -157,7 +157,7 @@ class Viewer:
         self.running     = False
         self.changeable  = False
         self.delete_menu(meniu) # peticeala, dar n-am vreo idee mai buna. comenteaza si vezi ce se intampla
-        self.controller.trigger_play()
+        self.controller.play()
 
     def test(self):
         pass
@@ -179,31 +179,36 @@ class Viewer:
                 posi = event.pos
                 if self.pausePlay.collidepoint(posi) :
                     if algRunning == True:
-                        self.controller.pause()
+                        self.controller.change_state()
+                        self.running = False
                     else:
-                        self.controller.trigger_play()
+                        self.controller.run_algorithm()
+                        self.running = False
                     return True
 
+                # 1 = faster, -1 = slower
                 if self.fast.collidepoint(posi):
-                    self.controller.change_speed(0.75)
+                    self.controller.change_speed(-1)
                 
                 if self.slow.collidepoint(posi):
-                    self.controller.change_speed(1.25)
+                    self.controller.change_speed(1)
 
                 if self.changeable == False:
                     continue
-                for i in range(len(self.arrList)):
-                    (rect, textRect, text, color) = self.arrList[i]
-                    if rect.collidepoint(posi):
-                        meniu = self.make_menu(500, 400, fs = 20)
-                        meniu.add_button("Sterge element", self.remove_element, i)
-                        meniu.add_text_input("Valoare:", default='0', textinput_id='val', input_type='__pygameMenu_input_int__')
-                        meniu.add_button("Adauga inaintea elementului", self.add_element, meniu, i)
-                        meniu.add_button("Adauga dupa element", self.add_element, meniu, i + 1)
-                        meniu.add_button("Cancel", self.delete_menu, meniu)
-                        #meniu.add_button("Start algorithm", self.start_algorithm, meniu)
-                        self.run_menu(meniu)
-                        return True
+
+                if algRunning == False:
+                    for i in range(len(self.arrList)):
+                        (rect, textRect, text, color) = self.arrList[i]
+                        if rect.collidepoint(posi):
+                            meniu = self.make_menu(500, 400, fs = 20)
+                            meniu.add_button("Sterge element", self.remove_element, i)
+                            meniu.add_text_input("Valoare:", default='0', textinput_id='val', input_type='__pygameMenu_input_int__')
+                            meniu.add_button("Adauga inaintea elementului", self.add_element, meniu, i)
+                            meniu.add_button("Adauga dupa element", self.add_element, meniu, i + 1)
+                            meniu.add_button("Cancel", self.delete_menu, meniu)
+                            #meniu.add_button("Start algorithm", self.start_algorithm, meniu)
+                            self.run_menu(meniu)
+                            return True
 
         return True
 
@@ -224,5 +229,9 @@ class Viewer:
         self.print_array(filename, algRunning)
         self.running = True
         while (self.running == True):
-            self.event_handler(algRunning)
-        print("exited visualize loop")
+            go_on = self.event_handler(algRunning) # returns False if ESC pressed
+            if (go_on == False):
+                print("exited visualize loop by ESC")
+                return False
+        print("exited visualize loop by natural causes")
+        return True

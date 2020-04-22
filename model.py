@@ -56,7 +56,9 @@ class BubbleSort(Algorithm):
 		while ok == 0:
 			ok = 1
 			for j in range(self.DS.sz-1):
+				print("M attempts to acquire")
 				self.controller.lock.acquire()
+				print("M acquired")
 				file = open(self.DS.filename,"w")
 				file.write(str(self.DS.sz)+"\n")
 				for k in range(j):
@@ -67,8 +69,11 @@ class BubbleSort(Algorithm):
 					file.write("{'content': " + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
 				file.close()
 				self.controller.lock.release()
+				print("M released")
 				if self.DS.list[j] > self.DS.list[j+1]:
+					print("M attempts to acquire")
 					self.controller.lock.acquire()
+					print("M acquired")
 					ok = 0
 					aux = self.DS.list[j]
 					self.DS.list[j] = self.DS.list[j+1]
@@ -79,11 +84,15 @@ class BubbleSort(Algorithm):
 						file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
 					file.close()
 					self.controller.lock.release()
+					print("M released")
+		print("M attempts to acquire")
 		self.controller.lock.acquire()
+		print("M acquired")
 		file = open(self.DS.filename,"w")
 		file.write(str(self.DS.sz)+"\n")
 		for k in range(self.DS.sz):
 			file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
 		file.close()
 		self.controller.lock.release()
+		print("M released")
 

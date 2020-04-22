@@ -5,13 +5,20 @@ import threading, time
 
 class SyncLock:
 	def __init__(self):
-		self.__lock     = threading.Lock()
-		self.__last_thr = None
-		self.__state    = False
-		self.__delay	= 0.25
+		self.__lock      = threading.Lock()
+		self.__last_thr  = None
+		self.__state     = False
+		self.__paused    = False
+		self.__index	 = 2
+		self.__delays	 = (0.0625, 0.125, 0.25, 0.5, 1)
 
-	def change_delay(self, multiplier):
-		self.__delay    = self.__delay * multiplier
+	def change_delay(self, direction):
+		if (direction == 1 and self.__index == len(self.__delays) - 1):
+			return
+		if (direction == -1 and self.__index == 0):
+			return
+		self.__index += direction
+		print(self.__delays[self.__index])
 
 	def set_last_thr(self, thr):
 		self.__last_thr = thr
@@ -22,25 +29,33 @@ class SyncLock:
 	def change_state(self):
 		self.__state = not(self.__state)
 
+	def trigger_pause(self):
+		self.__paused = not(self.__paused)
+
+	def is_paused(self):
+		return (self.__paused == True)
+
 	def acquire(self):
 		if (threading.current_thread() is threading.main_thread()):
 			self.__lock.acquire()
 			return
+
+		time.sleep(self.__delays[self.__index])
 		while (threading.current_thread() is self.__last_thr):
 			pass
-		time.sleep(self.__delay)
+		while (self.__paused == True):
+			pass
 		self.__lock.acquire()
+		self.__last_thr = threading.current_thread()
+		
 
 	def release(self):
-		if (threading.current_thread() is threading.main_thread()):
-			self.__lock.release()
-			return
-		self.__last_thr = threading.current_thread()
 		self.__lock.release()
 
 	def reset(self):
 		self.__last_thr = None
 		self.__state = False
+		self.paused  = False
 
 
 class Controller:
@@ -49,9 +64,9 @@ class Controller:
 		self.model    = Algorithm(self, filename)
 		self.viewer   = Viewer(self)
 		self.lock     = SyncLock()
-	
-	def change_speed(self, multiplier):
-		self.lock.change_delay(multiplier)
+
+	def change_speed(self, direction):
+		self.lock.change_delay(direction)
 
 	def choose_algorithm(self, id):
 		if (id == 0):
@@ -75,27 +90,48 @@ class Controller:
 	def remove_edge(self, id1, id2):
 		self.model.DS.remove_edge(id1, id2)
 
-	def trigger_play(self):
+	def run_algorithm(self):
 		M = threading.Thread(target=self.model.execute, args=())
 		V = threading.Thread(target=self.array_worker, args=())
+		T = threading.Thread(target=self.handler_worker, args=()) # trigger thread
 		self.lock.set_last_thr(V)
 		self.lock.change_state()
 		M.start()
 		V.start()
+		T.start()
 		M.join()
 		self.lock.change_state()
+		T.join()
 		V.join()
 		self.lock.reset()
+		print("done")
 
-	def pause(self):
-		pass
+	def change_state(self):
+		# code sucks, sry
+		# but at least it works lol
+		if (self.lock.is_paused() == True):
+			self.viewer.print_array(self.filename, True)
+			self.lock.trigger_pause()
+		else:
+			self.lock.trigger_pause()
+			time.sleep(0.05)
+			self.viewer.print_array(self.filename, False)
 
 	def array_worker(self):
 		while (self.lock.get_state() == True):
-			self.viewer.event_handler(False)
-			self.viewer.print_array(self.filename, False)
+			self.lock.acquire()
+			self.viewer.print_array(self.filename, True)
+			self.lock.release()
+
+	def handler_worker(self):		
+		while (self.lock.get_state() == True):
+			self.viewer.event_handler(True)
+		while (self.lock.is_paused() == True):
+			self.viewer.event_handler(True)
+		print("handler out")
 
 	def visualize(self):
-		while (True):
-			self.viewer.loop(self.filename, False)
-			self.viewer.event_handler(False)
+		go_on = True
+		while (go_on):
+			self.viewer.print_array(self.filename, False)
+			go_on = self.viewer.loop(self.filename, False)
