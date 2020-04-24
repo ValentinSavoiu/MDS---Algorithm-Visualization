@@ -112,6 +112,7 @@ class Viewer:
         img = pygame.image.load(os.path.join('icons', imgName))
         self.fast = pygame.Rect(self.pausePlay.right, self.pausePlay.top, img.get_width(), img.get_height())
         self.screen.blit(img, self.fast)
+        pygame.display.flip()
         
 
     def print_array(self, name, algRunning):
