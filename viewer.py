@@ -61,14 +61,21 @@ class Viewer:
                     self.menuRunning = False
             meniu.mainloop(events, disable_loop=True)
             pygame.display.flip()
+        self.delete_menu(meniu)
 
     def __init__(self, c):
         self.controller = c
         self.changeable = True
         pygame.init()
-        self.screen = pygame.display.set_mode((1000, 1000))
+        self.screen = pygame.display.set_mode((1400, 800))
         self.width, self.height = pygame.display.get_surface().get_size()
         self.font = pygame.font.Font('freesansbold.ttf', 32)
+        self.arrayRect = []
+        self.arrayRect.append(pygame.Rect(0, int(0.933 * self.height), self.width, int (0.067 * self.height)) )
+        self.arrayRect.append(pygame.Rect(0, self.arrayRect[0].top - int(0.067 * 2 * self.height), self.width, int(0.067 * self.height)))
+        self.controlRect = pygame.Rect(0, self.arrayRect[1].top - 48, self.width, 48)
+        self.graphRect = pygame.Rect(0, 0, self.width, self.controlRect.top)
+
         meniu = self.make_menu(bgfunn = self.main_background, dp = True)
         self.algorithm = 0
         meniu.add_button('Start', self.choose_algorithm)
@@ -98,9 +105,11 @@ class Viewer:
         self.screen.fill(white)
 
     def print_icons(self, algRunning):
+        self.clear_icons()
         imgName = 'play_medium.png' if algRunning == False else 'pause_medium.png'
         img = pygame.image.load(os.path.join('icons', imgName))
-        self.pausePlay = pygame.Rect(int(self.width // 2 - img.get_width() // 2), int(0.9 * self.height - img.get_height()), img.get_width(), img.get_height())
+        top = self.controlRect.top
+        self.pausePlay = pygame.Rect(int(self.width // 2 - img.get_width() // 2), top, img.get_width(), img.get_height())
         self.screen.blit(img, self.pausePlay)
 
         imgName = 'slow_medium.png'
@@ -113,39 +122,59 @@ class Viewer:
         self.fast = pygame.Rect(self.pausePlay.right, self.pausePlay.top, img.get_width(), img.get_height())
         self.screen.blit(img, self.fast)
         pygame.display.flip()
-        
+    
+    def clear_array(self, idx = 0) :
+        if idx > 1:
+            return
+        pygame.draw.rect(self.screen, white, self.arrayRect[idx], 0)
+        pygame.display.flip()
+    
+    def clear_graph(self):
+        pygame.draw.rect(self.screen, white, self.graphRect, 0)
+        pygame.display.flip()
 
-    def print_array(self, name, algRunning):
-#        print("V attempts to acquire")
-#        self.controller.lock.acquire()
-#        print("V acquired")
+    def clear_icons(self):
+        pygame.draw.rect(self.screen, white, self.controlRect, 0)
+        pygame.display.flip()
+
+    def print_array(self, name, algRunning, idx = 0):        
+        '''
+        testing
+        print("V attempts to acquire")
+        self.controller.lock.acquire()
+        print("V acquired")
+        '''
         fis = open(name, "r")
         n = int(fis.readline())
         startX = 0
         startY = int(0.9 * self.height)
         elWidth = self.width // n
-        elHeight = self.height // 10
-        
-        self.screen.fill((white))
-        self.arrList = []
+        elHeight = self.arrayRect[idx].height
+        top = self.arrayRect[idx].top
+        self.clear_array(idx)
+        if idx == 0:
+            self.arrList = []
         for i in range(n):
             info = ast.literal_eval(fis.readline())
             text = self.font.render(str(info['content']), True, black)
             if i == n - 1:
-                rect = pygame.Rect(int(i * elWidth), int(0.9 * self.height), self.width - i * elWidth, elHeight)
+                rect = pygame.Rect(int(i * elWidth), top, self.width - i * elWidth, elHeight)
             else:
-                rect = pygame.Rect(int(i * elWidth), int(0.9 * self.height), elWidth, elHeight)
+                rect = pygame.Rect(int(i * elWidth), top, elWidth, elHeight)
             textRect = text.get_rect()
             textRect.center = rect.center
             pygame.draw.rect(self.screen, info['color'],  rect, 0)
             pygame.draw.rect(self.screen, black,  rect, 1)
             self.screen.blit(text, textRect)
-            self.arrList.append((rect, textRect, text, info['color']))
+            if idx == 0:
+                self.arrList.append((rect, textRect, text, info['color']))
 
         self.print_icons(algRunning)
         pygame.display.flip()
-#        self.controller.lock.release()
-#        print("V released")
+        '''
+        self.controller.lock.release()
+        print("V released")
+        '''
             
     def add_element(self, meniu, pos):
         self.menuRunning = False
