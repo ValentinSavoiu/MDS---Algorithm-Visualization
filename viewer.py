@@ -55,7 +55,6 @@ class Viewer:
                                     window_width=windowWidth,
                                     back_box=False,
                                     dopause= dp
-
                                     )
         return meniu
         
@@ -188,6 +187,7 @@ class Viewer:
         self.controller.lock.release()
         print("V released")
         '''
+        fis.close()
             
     def add_element(self, meniu, pos):
         self.menuRunning = False
@@ -339,6 +339,7 @@ class Viewer:
 
         self.print_icons(algRunning)
         pygame.display.flip()
+        fis.close()
 
     def close(self):
         pygame.quit()
