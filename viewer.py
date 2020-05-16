@@ -139,7 +139,7 @@ class Viewer:
         if idx > 1:
             return
         pygame.draw.rect(self.screen, white, self.arrayRect[idx], 0)
-        pygame.display.flip()
+        #pygame.display.flip()
     
     def clear_graph(self):
         pygame.draw.rect(self.screen, white, self.graphRect, 0)
@@ -147,15 +147,9 @@ class Viewer:
 
     def clear_icons(self):
         pygame.draw.rect(self.screen, white, self.controlRect, 0)
-        pygame.display.flip()
+        #pygame.display.flip()
 
     def print_array(self, name, algRunning, idx = 0):        
-        '''
-        testing
-        print("V attempts to acquire")
-        self.controller.lock.acquire()
-        print("V acquired")
-        '''
         fis = open(name, "r")
         n = int(fis.readline())
         startX = 0
@@ -346,7 +340,7 @@ class Viewer:
 
     def loop(self, filename, algRunning, changeable = 'vector'):
         print("visualizer called")
-        self.print_array(filename, algRunning)
+        self.controller.print(algRunning)
         self.running = True
         while (self.running == True):
             go_on = self.event_handler(algRunning, changeable) # returns False if ESC pressed

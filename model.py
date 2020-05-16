@@ -4,7 +4,7 @@ class DataStructure:
 
 class Graph(DataStructure):
 	def __init__(self, filename):
-		DataStructure.__init__(self)
+		DataStructure.__init__(self, filename)
 
 class Vector(DataStructure):
 	def __init__(self, filename):
@@ -44,7 +44,7 @@ class Vector(DataStructure):
 class Algorithm:
 	def __init__(self, c, filename):
 		self.DS = DataStructure(filename)
-		self.controller = c
+		self.controller  = c
 
 class BubbleSort(Algorithm):
 	def __init__(self, c, filename):
@@ -52,13 +52,12 @@ class BubbleSort(Algorithm):
 		self.DS = Vector(filename)
 
 	def execute(self):
+		self.controller.signal_algo_start()
 		ok = 0
 		while ok == 0:
 			ok = 1
 			for j in range(self.DS.sz-1):
-				print("M attempts to acquire")
-				self.controller.lock.acquire()
-				print("M acquired")
+				self.controller.wait_for_next_step()
 				file = open(self.DS.filename,"w")
 				file.write(str(self.DS.sz)+"\n")
 				for k in range(j):
@@ -68,12 +67,9 @@ class BubbleSort(Algorithm):
 				for k in range(j+2,self.DS.sz):
 					file.write("{'content': " + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
 				file.close()
-				self.controller.lock.release()
-				print("M released")
+				self.controller.signal_step_done()
 				if self.DS.list[j] > self.DS.list[j+1]:
-					print("M attempts to acquire")
-					self.controller.lock.acquire()
-					print("M acquired")
+					self.controller.wait_for_next_step()
 					ok = 0
 					aux = self.DS.list[j]
 					self.DS.list[j] = self.DS.list[j+1]
@@ -83,16 +79,18 @@ class BubbleSort(Algorithm):
 					for k in range(self.DS.sz):
 						file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
 					file.close()
-					self.controller.lock.release()
-					print("M released")
-		print("M attempts to acquire")
-		self.controller.lock.acquire()
-		print("M acquired")
+					self.controller.signal_step_done()
+
+		self.controller.wait_for_next_step()
 		file = open(self.DS.filename,"w")
 		file.write(str(self.DS.sz)+"\n")
 		for k in range(self.DS.sz):
 			file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
 		file.close()
-		self.controller.lock.release()
-		print("M released")
+		self.controller.signal_step_done()
+		self.controller.signal_algo_done()
 
+class BFS(Algorithm):
+	def __init__(self, c, filename):
+		Algorithm.__init__(self, c, filename)
+		self.DS = Graph(filename)
