@@ -11,9 +11,9 @@ import threading, time, queue
 
 class Controller:
 	def __init__(self, filename):
-		self.filename = filename
-		self.model    = Algorithm(self, filename)
-		self.viewer   = Viewer(self)
+		self.filename 	  = filename
+		self.model  	  = Algorithm(self, filename)
+		self.viewer 	  = Viewer(self)
 		self.trigger_msgs = queue.Queue() # handler to array worker communication
 		self.cnttrig_msgs = queue.Queue() # central controller to trigger comunication
 		self.viewmod_msgs = queue.Queue() # viewer to model communication
@@ -29,7 +29,8 @@ class Controller:
 		self.speed_index += direction
 		print(self.speeds[self.speed_index])
 
-	def choose_algorithm(self, id):
+	def choose_algorithm(self, id, filename):
+		self.filename = filename
 		if (id == 0):
 			self.model = BubbleSort(self, self.filename,)
 		elif (id == 1):
@@ -160,6 +161,7 @@ class Controller:
 
 	def visualize(self):
 		go_on = True
+		self.viewer.print_icons(False)
 		while (go_on):
 			self.print(False)
 			go_on = self.viewer.loop(self.filename, False)
