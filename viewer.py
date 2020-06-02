@@ -200,24 +200,28 @@ class Viewer:
     def add_element(self, meniu, pos):
         self.menuRunning = False
         self.running     = False
+        self.graphMenuRunning = False
         val = self.get_value(meniu, 'val')
         self.controller.add_element(val, pos)
 
     def remove_graph_element(self, meniu, i):
         self.menuRunning = False
         self.running = False
+        self.graphMenuRunning = False
         val = self.get_value(meniu, 'val' + str(i))
         self.controller.remove_element(val)
 
     def add_edge(self, meniu):
         self.menuRunning = False
         self.running = False
+        self.graphMenuRunning = False
         val1 = self.get_value(meniu, 'val1')
         val2 = self.get_value(meniu, 'val2')
         self.controller.add_edge(val1, val2)
 
     def start_algorithm(self, meniu):
         self.menuRunning = False
+        self.graphMenuRunning = False
         self.running     = False
         self.changeable  = False
         self.delete_menu(meniu) # peticeala, dar n-am vreo idee mai buna. comenteaza si vezi ce se intampla
@@ -244,7 +248,11 @@ class Viewer:
             self.meniu.add_button("Sterge nod 2", self.remove_graph_element, self.meniu, 2)
             self.meniu.add_button("Adauga muchie intre Nod1 si Nod2", self.add_edge, self.meniu)
             self.meniu.add_button("Done", self.delete_menu, self.meniu)
-            
+        
+        if self.graphMenuRunning == True and changeable != 'graph':
+            self.graphMenuRunning = False
+            self.delete_menu(self.meniu)
+
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -312,11 +320,12 @@ class Viewer:
                         break 
                 if OK == 0:
                     continue
+                self.graphMenuRunning = False
                 self.menuRunning = False
                 self.running = False
                 self.controller.add_element(value = -1, position = posi)
                 
-        if self.graphMenuRunning == True:
+        if self.graphMenuRunning == True and changeable == 'graph':
             self.meniu.mainloop(events, disable_loop=True)
         pygame.display.flip()
         return True
