@@ -204,10 +204,14 @@ class Viewer:
         self.controller.add_element(val, pos)
 
     def remove_graph_element(self, meniu, i):
+        self.menuRunning = False
+        self.running = False
         val = self.get_value(meniu, 'val' + str(i))
-        self.controller.remove_elemend(id)
+        self.controller.remove_element(val)
 
     def add_edge(self, meniu):
+        self.menuRunning = False
+        self.running = False
         val1 = self.get_value(meniu, 'val1')
         val2 = self.get_value(meniu, 'val2')
         self.controller.add_edge(val1, val2)
@@ -308,7 +312,8 @@ class Viewer:
                         break 
                 if OK == 0:
                     continue
-        
+                self.menuRunning = False
+                self.running = False
                 self.controller.add_element(value = -1, position = posi)
                 
         if self.graphMenuRunning == True:
