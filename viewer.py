@@ -25,7 +25,8 @@ class Viewer:
     def visit_pygame(self):
         webbrowser.open('https://www.pygame.org/news', new=0, autoraise=True)
 
-    def make_menu(self, menuWidth = None, menuHeight = None, bgfunn = None, dp = False, fs = 40, columns = 1, rows = None, windowHeight = None, windowWidth = None):
+    def make_menu(self, menuWidth = None, menuHeight = None, bgfunn = None, dp = False, fs = 40, columns = 1, 
+                  rows = None, windowHeight = None, windowWidth = None, title = ''):
         if menuWidth is None:
             menuWidth = int(self.width)
         if menuHeight is None:
@@ -36,25 +37,24 @@ class Viewer:
             windowWidth = int(self.width)
 
         meniu = pygameMenu.Menu(    self.screen,
-                                    bgfun=bgfunn,
-                                    color_selected=green,
-                                    font=pygameMenu.font.FONT_HELVETICA,
-                                    font_color=black,
-                                    font_size=fs,
-                                    #menu_alpha=100,
+                                    bgfun = bgfunn,
+                                    color_selected = green,
+                                    font = pygameMenu.font.FONT_HELVETICA,
+                                    font_color = black,
+                                    font_size = fs,
                                     columns = columns,
                                     rows = rows,
-                                    menu_color_title=white,
-                                    menu_color=white,
-                                    menu_height=menuHeight,
-                                    menu_width=menuWidth,
-                                    onclose=pygameMenu.events.EXIT,
-                                    option_shadow=False,
-                                    title='',
-                                    window_height=windowHeight,
-                                    window_width=windowWidth,
-                                    back_box=False,
-                                    dopause= dp
+                                    menu_color_title = white,
+                                    menu_color = white,
+                                    menu_height = menuHeight,
+                                    menu_width = menuWidth,
+                                    onclose = pygameMenu.events.EXIT,
+                                    option_shadow = False,
+                                    title = title,
+                                    window_height = windowHeight,
+                                    window_width = windowWidth,
+                                    back_box = False,
+                                    dopause = dp
                                     )
         return meniu
         
@@ -89,13 +89,14 @@ class Viewer:
         self.nodeList = []
         meniu = self.make_menu(bgfunn = self.main_background, dp = True)
         self.algorithm = 0
-        meniu.add_button('Start', self.choose_algorithm)
+        meniu.add_button('Start', self.choose_algorithm, meniu)
         meniu.add_selector('',
                                [('Bubblesort', 0),
                                 ('BFS', 1),
                                 ('NotImplemented', 2)],
                                onchange=self.change_algorithm,
                                selector_id='select_difficulty')
+        meniu.add_text_input("Filename: ", default='', textinput_id='filename')
         meniu.add_button('View source code', self.github)
         meniu.add_button('More about pygame', self.visit_pygame)
         meniu.set_fps(60)
@@ -106,9 +107,24 @@ class Viewer:
         self.menuRunning = False
         self.running = False
 
-    def choose_algorithm(self):
-        self.menuRunning = False
-        self.controller.choose_algorithm(self.algorithm)
+    def choose_algorithm(self, meniu):
+        fn = meniu.get_input_data()['filename']
+        if fn == '':
+            self.menuRunning = False
+            self.controller.choose_algorithm(self.algorithm, 'test.txt')
+            return
+        mypath = os.path.join('inputs', fn)
+        if os.path.exists(mypath) and os.path.isfile(mypath):
+            self.menuRunning = False
+            self.controller.choose_algorithm(self.algorithm, mypath)
+        else:
+            fs = 32
+            txt = 'ERROR: FILE DOES NOT EXIST IN INPUTS FOLDER'
+            rect = self.font.render(txt, 0, black, blue).get_rect()
+            meniu._menubar.set_title(txt, self.width // 2 - rect.width // 2)
+            meniu._menubar.set_font('freesans', font_size = fs, color = white, selected_color = red)
+            
+            
 
     def change_algorithm(self, choice, value):
         self.algorithm = value
@@ -174,8 +190,6 @@ class Viewer:
             self.screen.blit(text, textRect)
             if idx == 0:
                 self.arrList.append((rect, textRect, text, info['color']))
-
-        self.print_icons(algRunning)
         pygame.display.flip()
         '''
         self.controller.lock.release()
@@ -191,7 +205,7 @@ class Viewer:
 
     def remove_graph_element(self, meniu, i):
         val = self.get_value(meniu, 'val' + str(i))
-        self.controller.remove_node(val)
+        self.controller.remove_elemend(id)
 
     def add_edge(self, meniu):
         val1 = self.get_value(meniu, 'val1')
@@ -232,6 +246,14 @@ class Viewer:
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 self.running = False
                 return False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                if algRunning == True:
+                    self.controller.change_state()
+                    self.running = False
+                else:
+                    self.controller.run_algorithm()
+                    self.running = False
+                return True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 posi = event.pos
                 if self.pausePlay.collidepoint(posi) :
@@ -305,7 +327,7 @@ class Viewer:
     def print_graph(self, name, algRunning):
         fis = open(name, "r")
         lines = fis.readlines()
-        (N, M, type_) = lines[0].split(" ")
+        (N, M, type_) = lines[0].split(' ')
         (N, M) = (int(N), int(M))
         self.clear_graph()
         nodes = ast.literal_eval(lines[1])
@@ -330,8 +352,6 @@ class Viewer:
             textRect = text.get_rect()
             textRect.center = node['pos']
             self.screen.blit(text, textRect)
-
-        self.print_icons(algRunning)
         pygame.display.flip()
         fis.close()
 
@@ -350,9 +370,8 @@ class Viewer:
         print("exited visualize loop by natural causes")
         return True
 
-
-#if __name__ == "__main__":
-    #v = Viewer(None)
-    #v.print_graph('test_graph.txt', False)
-    #while v.event_handler(False, 'graph'):
-       #pass
+if __name__ == "__main__":
+    v = Viewer(None)
+    v.print_graph('test_graph.txt', False)
+    while v.event_handler(False, 'graph'):
+        pass

@@ -11,9 +11,9 @@ import threading, time, queue
 
 class Controller:
 	def __init__(self, filename):
-		self.filename = filename
-		self.model    = Algorithm(self, filename)
-		self.viewer   = Viewer(self)
+		self.filename 	  = filename
+		self.model  	  = Algorithm(self, filename)
+		self.viewer 	  = Viewer(self)
 		self.trigger_msgs = queue.Queue() # handler to array worker communication
 		self.cnttrig_msgs = queue.Queue() # central controller to trigger comunication
 		self.viewmod_msgs = queue.Queue() # viewer to model communication
@@ -29,7 +29,8 @@ class Controller:
 		self.speed_index += direction
 		print(self.speeds[self.speed_index])
 
-	def choose_algorithm(self, id):
+	def choose_algorithm(self, id, filename):
+		self.filename = filename
 		if (id == 0):
 			self.model = BubbleSort(self, self.filename,)
 		elif (id == 1):
@@ -39,15 +40,15 @@ class Controller:
 	
 	def add_element(self, value, position):
 		self.model.DS.add_element(value, position)
-  
-	def remove_element(self, id):
-    		self.model.DS.remove_element(id)
-      
-	def remove_node(self, id):
-		self.model.DS.remove_node(id)
 
 	def add_edge(self, id1, id2):
 		self.model.DS.add_edge(id1, id2)
+
+	def remove_element(self, id):
+		self.model.DS.remove_element(id)
+
+	def remove_edge(self, id1, id2):
+		self.model.DS.remove_edge(id1, id2)
 
 
 	def cleanup(self, q):
@@ -160,6 +161,7 @@ class Controller:
 
 	def visualize(self):
 		go_on = True
+		self.viewer.print_icons(False)
 		while (go_on):
 			self.print(False)
 			go_on = self.viewer.loop(self.filename, False, 'graph')

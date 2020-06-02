@@ -49,7 +49,7 @@ class Graph(DataStructure):
         file.write(str(self.edges) + '\n')
         file.close()
     
-    def remove_node(self, id):
+    def remove_element(self, id):
         x = int(id)
         if len(self.nodes) > 1:
             self.n -= 1
@@ -81,7 +81,18 @@ class Graph(DataStructure):
             file.write(str(self.nodes) + '\n')
             file.write(str(self.edges) + '\n')
             file.close()
-            
+    
+    def add_element(self, value, position):
+        x = position[0]
+        y = position[1]
+        new_node = {'pos': (x, y), 'color': (112, 112, 112)}
+        self.nodes.append(new_node)
+        self.n += 1
+        file = open(self.filename, "w")
+        file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
+        file.write(str(self.nodes) + '\n')
+        file.write(str(self.edges) + '\n')
+        file.close()
        
         
 
