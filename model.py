@@ -114,7 +114,7 @@ class Vector(DataStructure):
         file.close()
   
     def remove_element(self,id):
-        if len(self.lista) > 1:
+        if len(self.list) > 1:
             del self.list[id]
             self.sz = self.sz - 1
             file = open(self.filename,"w")
