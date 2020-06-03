@@ -6,6 +6,7 @@ import pygameMenu.events
 import ast
 import webbrowser  
 import os
+import math
 
 DEF_RADIUS = 30
 """
@@ -269,7 +270,6 @@ class Viewer:
 
     def event_handler(self, algRunning, changeable = 'vector'):
         time.sleep(0.2)
-        print(changeable)
         if self.graphMenuRunning == False and changeable == 'graph':
             self.meniu = self.make_menu(menuWidth = self.width, menuHeight = self.arrayRect[0].height * 3, fs = 30, columns = 3, rows = 3,
                                         windowWidth = self.width, windowHeight = self.height + self.controlRect.bottom)
@@ -373,7 +373,42 @@ class Viewer:
         posi = meniu.get_position()
         rect = pygame.Rect(posi[0], posi[1], posi[2] - posi[0], posi[3] - posi[1])
         pygame.draw.rect(self.screen, white, rect, 0)
-      
+
+    def arrow(self, lcolor, tricolor, start, end, trirad):
+        pygame.draw.line(self.screen, lcolor, start, end, 3)
+        rotation = math.degrees(math.atan2(start[1] - end[1], end[0] - start[0])) + 90
+        end = (end[0] - 0.4 * math.dist(start, end) * math.sin(math.radians(rotation)),
+               end[1] - 0.4 * math.dist(start, end) * math.cos(math.radians(rotation)))
+        pygame.draw.polygon(self.screen, tricolor, (
+                                            (end[0] + trirad * math.sin(math.radians(rotation)), 
+                                            end[1] + trirad*math.cos(math.radians(rotation))), 
+                                            (end[0] + trirad*math.sin(math.radians(rotation - 120)), 
+                                            end[1] + trirad*math.cos(math.radians(rotation - 120))), 
+                                            (end[0] + trirad*math.sin(math.radians(rotation + 120)), 
+                                            end[1] + trirad*math.cos(math.radians(rotation + 120)))
+                                            )
+                            )
+
+    def draw_lines(self, edge, type_, nodes):
+        start = nodes[edge['x']]['pos']
+        end = nodes[edge['y']]['pos']
+        rotation = math.degrees(math.atan2(start[1] - end[1], end[0] - start[0]))
+        if type_ == 'undirected\n':
+            rotation += 90
+            e = (end[0] - DEF_RADIUS * math.sin(math.radians(rotation)),  end[1] - DEF_RADIUS * math.cos(math.radians(rotation)))
+            s = (start[0] + DEF_RADIUS * math.sin(math.radians(rotation)),  start[1] + DEF_RADIUS * math.cos(math.radians(rotation)))
+        else :
+            e = (end[0] + DEF_RADIUS * math.sin(math.radians(rotation)),  end[1] + DEF_RADIUS * math.cos(math.radians(rotation)))
+            s = (start[0] + DEF_RADIUS * math.sin(math.radians(rotation)),  start[1] + DEF_RADIUS * math.cos(math.radians(rotation)))
+        
+        if type_ == 'undirected\n':
+            pygame.draw.line(self.screen, edge['color'], s, e, 3)
+        else:
+            self.arrow(edge['color'], blue, s, e, 15)
+        return (s, e)
+        
+        
+
     def print_graph(self, name, algRunning):
         fis = open(name, "r")
         lines = fis.readlines()
@@ -383,8 +418,7 @@ class Viewer:
         nodes = ast.literal_eval(lines[1])
         edges = ast.literal_eval(lines[2])
         self.nodeList = []
-        for edge in edges:
-            pygame.draw.line(self.screen, edge['color'], nodes[edge['x']]['pos'], nodes[edge['y']]['pos'], 3)
+
         idx = 0
         for node in nodes:
             if 'radius' not in node.keys():
@@ -402,6 +436,16 @@ class Viewer:
             textRect = text.get_rect()
             textRect.center = node['pos']
             self.screen.blit(text, textRect)
+        
+        for edge in edges:
+            pos1, pos2 = self.draw_lines(edge, type_, nodes)
+            if 'cost' in edge.keys():
+                midpos = ((pos1[0] + pos2[0]) / 2, (pos1[1] + pos2[1]) / 2)
+                text = self.font.render(str(edge['cost']), True, black)
+                textRect = text.get_rect()
+                textRect.center = midpos
+                self.screen.blit(text, textRect)
+
         pygame.display.flip()
         fis.close()
 
