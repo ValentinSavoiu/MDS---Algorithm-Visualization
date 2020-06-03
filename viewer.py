@@ -25,6 +25,13 @@ class Viewer:
     def visit_pygame(self):
         webbrowser.open('https://www.pygame.org/news', new=0, autoraise=True)
 
+    def help(self):
+        webbrowser.open('https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/blob/graph_experimental/README.md', new=0, autoraise=True)
+
+    def full_random(self):
+        self.menuRunning = False
+        self.controller.full_random()
+
     def make_menu(self, menuWidth = None, menuHeight = None, bgfunn = None, dp = False, fs = 40, columns = 1, 
                   rows = None, windowHeight = None, windowWidth = None, title = ''):
         if menuWidth is None:
@@ -90,6 +97,7 @@ class Viewer:
         meniu = self.make_menu(bgfunn = self.main_background, dp = True)
         self.algorithm = 0
         meniu.add_button('Start', self.choose_algorithm, meniu)
+        meniu.add_button('Feeling lucky', self.full_random)
         meniu.add_selector('',
                                [('Bubblesort', 0),
                                 ('BFS', 1),
@@ -99,6 +107,7 @@ class Viewer:
         meniu.add_text_input("Filename: ", default='', textinput_id='filename')
         meniu.add_button('View source code', self.github)
         meniu.add_button('More about pygame', self.visit_pygame)
+        meniu.add_button('Help', self.help)
         meniu.set_fps(60)
         self.run_menu(meniu)
         
@@ -165,7 +174,7 @@ class Viewer:
         pygame.draw.rect(self.screen, white, self.controlRect, 0)
         #pygame.display.flip()
 
-    def print_array(self, name, algRunning, idx = 0):        
+    def print_array(self, name, algRunning, idx = 0):      
         fis = open(name, "r")
         n = int(fis.readline())
         startX = 0
@@ -211,6 +220,14 @@ class Viewer:
         val = self.get_value(meniu, 'val' + str(i))
         self.controller.remove_element(val)
 
+
+    def set_source(self, meniu, i):
+        self.menuRunning = False
+        self.running = False
+        self.graphMenuRunning = False
+        val = self.get_value(meniu, 'val' + str(i))
+        self.controller.set_source(val)
+
     def add_edge(self, meniu):
         self.menuRunning = False
         self.running = False
@@ -218,6 +235,14 @@ class Viewer:
         val1 = self.get_value(meniu, 'val1')
         val2 = self.get_value(meniu, 'val2')
         self.controller.add_edge(val1, val2)
+
+    def remove_edge(self, meniu):
+        self.menuRunning = False
+        self.running = False
+        self.graphMenuRunning = False
+        val1 = self.get_value(meniu, 'val1')
+        val2 = self.get_value(meniu, 'val2')
+        self.controller.remove_edge(val1, val2)
 
     def start_algorithm(self, meniu):
         self.menuRunning = False
@@ -230,6 +255,11 @@ class Viewer:
     def test(self):
         pass
 
+    def reverse_array(self):
+        self.menuRunning = False
+        self.running = False
+        self.controller.reverse_array()
+    
     def get_value(self, meniu, id):
         try:
             val = int(meniu.get_input_data()[id])
@@ -238,6 +268,8 @@ class Viewer:
         return val
 
     def event_handler(self, algRunning, changeable = 'vector'):
+        time.sleep(0.2)
+        print(changeable)
         if self.graphMenuRunning == False and changeable == 'graph':
             self.meniu = self.make_menu(menuWidth = self.width, menuHeight = self.arrayRect[0].height * 3, fs = 30, columns = 3, rows = 3,
                                         windowWidth = self.width, windowHeight = self.height + self.controlRect.bottom)
@@ -247,6 +279,9 @@ class Viewer:
             self.meniu.add_button("Sterge nod 1", self.remove_graph_element, self.meniu, 1)
             self.meniu.add_button("Sterge nod 2", self.remove_graph_element, self.meniu, 2)
             self.meniu.add_button("Adauga muchie intre Nod1 si Nod2", self.add_edge, self.meniu)
+            self.meniu.add_button("Sterge muchia dintre Nod1 si Nod2", self.remove_edge, self.meniu)
+            self.meniu.add_button("Nod1 start parcurgere", self.set_source, self.meniu, 1)
+            self.meniu.add_button("Nod2 start parcurgere", self.set_source, self.meniu, 2)
             self.meniu.add_button("Done", self.delete_menu, self.meniu)
         
         if self.graphMenuRunning == True and changeable != 'graph':
@@ -300,6 +335,7 @@ class Viewer:
                                 "Adauga inaintea elementului", self.add_element, meniu, i)
                             meniu.add_button(
                                 "Adauga dupa element", self.add_element, meniu, i + 1)
+                            meniu.add_button("Inverseaza vectorul", self.reverse_array)
                             meniu.add_button("Cancel", self.delete_menu, meniu)
                             #meniu.add_button("Start algorithm", self.start_algorithm, meniu)
                             self.run_menu(meniu)
