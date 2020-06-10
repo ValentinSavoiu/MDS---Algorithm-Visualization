@@ -66,7 +66,6 @@ class Viewer:
                                     )
         return meniu
         
-
     def run_menu(self, meniu):
         self.menuRunning = True
         while self.menuRunning == True:
@@ -134,8 +133,6 @@ class Viewer:
             meniu._menubar.set_title(txt, self.width // 2 - rect.width // 2)
             meniu._menubar.set_font('freesans', font_size = fs, color = white, selected_color = red)
             
-            
-
     def change_algorithm(self, choice, value):
         self.algorithm = value
 
@@ -147,12 +144,17 @@ class Viewer:
         imgName = 'play_medium.png' if algRunning == False else 'pause_medium.png'
         img = pygame.image.load(os.path.join('icons', imgName))
         top = self.controlRect.top
-        self.pausePlay = pygame.Rect(int(self.width // 2 - img.get_width() // 2), top, img.get_width(), img.get_height())
+        self.pausePlay = pygame.Rect(int(self.width // 2), top, img.get_width(), img.get_height())
         self.screen.blit(img, self.pausePlay)
+        imgName = 'one_step_medium.png'
+        img = pygame.image.load(os.path.join('icons', imgName))
+        self.oneStep = pygame.Rect(self.pausePlay.left - img.get_width(), self.pausePlay.top, img.get_width(), img.get_height())
+        self.screen.blit(img, self.oneStep)
+
 
         imgName = 'slow_medium.png'
         img = pygame.image.load(os.path.join('icons', imgName))
-        self.slow = pygame.Rect(self.pausePlay.left - img.get_width(), self.pausePlay.top, img.get_width(), img.get_height())
+        self.slow = pygame.Rect(self.oneStep.left - img.get_width(), self.pausePlay.top, img.get_width(), img.get_height())
         self.screen.blit(img, self.slow)
 
         imgName = 'fast_medium.png'
@@ -313,6 +315,9 @@ class Viewer:
                         self.controller.run_algorithm()
                         self.running = False
                     return True
+
+                if self.oneStep.collidepoint(posi):
+                    self.controller.run_one_step()
 
                 # 1 = faster, -1 = slower
                 if self.fast.collidepoint(posi):

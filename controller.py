@@ -124,6 +124,9 @@ class Controller:
 		self.trigger_msgs.join()
 		time.sleep(0.1)
 
+	def run_one_step(self):
+		print("One step called")
+		pass
 
 	def handler_worker(self):
 		go_on = True
