@@ -35,14 +35,16 @@ class Controller:
 			self.model = BubbleSort(self, self.filename,)
 		elif (id == 1):
 			self.model = BFS(self, self.filename)
+		elif (id == 2):
+			self.model = Dijkstra(self, self.filename)
 		else:
 			raise NotImplementedError("controller.choose_algorithm: Unknown algorithm {}".format(id))
 	
 	def add_element(self, value, position):
 		self.model.DS.add_element(value, position)
 
-	def add_edge(self, id1, id2):
-		self.model.DS.add_edge(id1, id2)
+	def add_edge(self, id1, id2, cost = 1):
+		self.model.DS.add_edge(id1, id2, cost)
 
 	def remove_element(self, id):
 		self.model.DS.remove_element(id)

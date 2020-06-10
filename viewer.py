@@ -102,7 +102,7 @@ class Viewer:
         meniu.add_selector('',
                                [('Bubblesort', 0),
                                 ('BFS', 1),
-                                ('NotImplemented', 2)],
+                                ('Djikstra', 2)],
                                onchange=self.change_algorithm,
                                selector_id='select_difficulty')
         meniu.add_text_input("Filename: ", default='', textinput_id='filename')
@@ -235,7 +235,8 @@ class Viewer:
         self.graphMenuRunning = False
         val1 = self.get_value(meniu, 'val1')
         val2 = self.get_value(meniu, 'val2')
-        self.controller.add_edge(val1, val2)
+        cost = self.get_value(meniu, 'cost')
+        self.controller.add_edge(val1, val2, cost)
 
     def remove_edge(self, meniu):
         self.menuRunning = False
@@ -276,13 +277,14 @@ class Viewer:
             self.graphMenuRunning = True
             self.meniu.add_text_input("Nod1:", default='0', textinput_id='val1', input_type='__pygameMenu_input_int__')
             self.meniu.add_text_input("Nod2:", default='0', textinput_id='val2', input_type='__pygameMenu_input_int__')
+            if self.algorithm == 2:
+                self.meniu.add_text_input("Cost:", default='1', textinput_id='cost', input_type='__pygameMenu_input_int__')
             self.meniu.add_button("Sterge nod 1", self.remove_graph_element, self.meniu, 1)
             self.meniu.add_button("Sterge nod 2", self.remove_graph_element, self.meniu, 2)
             self.meniu.add_button("Adauga muchie intre Nod1 si Nod2", self.add_edge, self.meniu)
             self.meniu.add_button("Sterge muchia dintre Nod1 si Nod2", self.remove_edge, self.meniu)
             self.meniu.add_button("Nod1 start parcurgere", self.set_source, self.meniu, 1)
             self.meniu.add_button("Nod2 start parcurgere", self.set_source, self.meniu, 2)
-            self.meniu.add_button("Done", self.delete_menu, self.meniu)
         
         if self.graphMenuRunning == True and changeable != 'graph':
             self.graphMenuRunning = False

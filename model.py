@@ -45,7 +45,7 @@ class Graph(DataStructure):
             self.start = x
 
     
-    def add_edge(self, id1, id2):
+    def add_edge(self, id1, id2, cost = 1):
         x = int(id1)
         y = int(id2)
         if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
