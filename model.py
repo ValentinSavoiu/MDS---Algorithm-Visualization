@@ -1,4 +1,5 @@
 import ast
+from sortedcontainers import SortedSet
 
 class DataStructure:
     def __init__(self, filename):
@@ -13,6 +14,7 @@ class Graph(DataStructure):
         self.n = int(l[0])
         self.m = int(l[1])
         self.tp = l[2][:10]
+        self.start = 0
         self.nodes = ast.literal_eval(file.readline())
         self.edges = ast.literal_eval(file.readline())
         self.graph = {}
@@ -21,17 +23,32 @@ class Graph(DataStructure):
             y = int(edge['y'])
             if x not in self.graph.keys():
                 self.graph[x] = []
-            self.graph[x].append(y)
+            if 'cost' in edge.keys():
+                c = int(edge['cost'])
+                self.graph[x].append((y, c))
+            else:
+                self.graph[x].append((y, 1))
             if self.tp == "undirected":
+                print("DA")
                 if y not in self.graph.keys():
                     self.graph[y] = []
-                self.graph[y].append(x)
+                if 'cost' in edge.keys():
+                    c = int(edge['cost'])
+                    self.graph[y].append((x, c))
+                else:
+                    self.graph[y].append((x, 1))
         file.close()
+    
+    def set_source(self, node):
+        x = int(node)
+        if x >=0 and x < self.n:
+            self.start = x
+
     
     def add_edge(self, id1, id2):
         x = int(id1)
         y = int(id2)
-        if x < self.n and y < self.n:
+        if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
             new_edge = {'x': x, 'y': y, 'color': (77, 77, 77)}
             new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77)}
             if new_edge not in self.edges and new_edge_rev not in self.edges:
@@ -41,8 +58,8 @@ class Graph(DataStructure):
                     self.graph[x] = []
                 if y not in self.graph.keys():
                     self.graph[y] = []
-                self.graph[y].append(x)
-                self.graph[x].append(y)
+                self.graph[y].append((x, 1))
+                self.graph[x].append((y, 1))
         file = open(self.filename, "w")
         file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
         file.write(str(self.nodes) + '\n')
@@ -71,11 +88,19 @@ class Graph(DataStructure):
                 y = int(edge['y'])
                 if x not in self.graph.keys():
                     self.graph[x] = []
-                self.graph[x].append(y)
+                    if 'cost' in edge.keys():
+                        c = int(edge['cost'])
+                        self.graph[x].append((y, c))
+                    else:
+                        self.graph[x].append((y, 1))
                 if self.tp == "undirected":
                     if y not in self.graph.keys():
                         self.graph[y] = []
-                    self.graph[y].append(x)
+                    if 'cost' in edge.keys():
+                        c = int(edge['cost'])
+                        self.graph[y].append((x, c))
+                    else:
+                        self.graph[y].append((x, 1))
             file = open(self.filename, "w")
             file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
             file.write(str(self.nodes) + '\n')
@@ -93,10 +118,43 @@ class Graph(DataStructure):
         file.write(str(self.nodes) + '\n')
         file.write(str(self.edges) + '\n')
         file.close()
-       
+    
+    def remove_edge(self, id1, id2):
+        pos = -1
+        for i in range(self.m):
+            #print(int(self.edges[i]['x']), int(self.edges[i]['y']))
+            if (int(self.edges[i]['x']) == int(id1) and int(self.edges[i]['y']) == int(id2)) or (int(self.edges[i]['x']) == int(id2) and int(self.edges[i]['y']) == int(id1)):
+                pos = i
+        print(pos)
+        if pos >= 0:
+            del self.edges[pos]
+            self.m -= 1
+        self.graph = {}
+        for edge in self.edges:
+            x = int(edge['x'])
+            y = int(edge['y'])
+            if x not in self.graph.keys():
+                self.graph[x] = []
+                if 'cost' in edge.keys():
+                    c = int(edge['cost'])
+                    self.graph[x].append((y, c))
+                else:
+                    self.graph[x].append((y, 1))
+            if self.tp == "undirected":
+                if y not in self.graph.keys():
+                    self.graph[y] = []
+                if 'cost' in edge.keys():
+                    c = int(edge['cost'])
+                    self.graph[y].append((x, c))
+                else:
+                    self.graph[y].append((x, 1))
+        file = open(self.filename, "w")
+        file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
+        file.write(str(self.nodes) + '\n')
+        file.write(str(self.edges) + '\n')
+        file.close()
         
-
-
+        
 class Vector(DataStructure):
     def __init__(self, filename):
         DataStructure.__init__(self, filename)
@@ -112,13 +170,13 @@ class Vector(DataStructure):
                 j = j + 1
             self.list.append(value)
         file.close()
-  
+    
     def remove_element(self,id):
         if len(self.list) > 1:
             del self.list[id]
             self.sz = self.sz - 1
-            file = open(self.filename,"w")
-            file.write(str(self.sz)+"\n")
+            file = open(self.filename, "w")
+            file.write(str(self.sz) + "\n")
             for i in range(self.sz):
                 file.write("{'content':" + str(self.list[i]) + ", 'color':(100,100,100)}\n")
             file.close()
@@ -126,6 +184,14 @@ class Vector(DataStructure):
     def add_element(self,value,position):
         self.list.insert(position,value)
         self.sz = self.sz + 1
+        file = open(self.filename, "w")
+        file.write(str(self.sz) + "\n")
+        for i in range(self.sz):
+            file.write("{'content':" + str(self.list[i]) + ", 'color':(100,100,100)}\n")
+        file.close()
+    
+    def reverse_array(self):
+        self.list.reverse()
         file = open(self.filename,"w")
         file.write(str(self.sz)+"\n")
         for i in range(self.sz):
@@ -188,9 +254,9 @@ class BFS(Algorithm):
     def execute(self):
         self.controller.signal_algo_start()
         coada = []
-        coada.append(0)
+        coada.append(self.DS.start)
         vis = {}
-        vis[0] = 1
+        vis[self.DS.start] = 1
         while len(coada) > 0:
             x = int(coada.pop(0))
             self.controller.wait_for_next_step()
@@ -203,11 +269,75 @@ class BFS(Algorithm):
             self.controller.signal_step_done()
             if x in self.DS.graph.keys():
                 for nxt in self.DS.graph[x]:
-                    if nxt not in vis.keys():
-                        vis[nxt] = 1
-                        coada.append(nxt)
+                    if nxt[0] not in vis.keys():
+                        vis[nxt[0]] = 1
+                        coada.append(nxt[0])
+        self.controller.wait_for_next_step()
+        for i in range(self.DS.n):
+            self.DS.nodes[i]['color'] = (112, 112, 112)
+        file = open(self.DS.filename, "w")
+        file.write(str(self.DS.n) + " " + str(self.DS.m) + " " + str(self.DS.tp) + '\n')
+        file.write(str(self.DS.nodes) + '\n')
+        file.write(str(self.DS.edges) + '\n')
+        file.close()
+        self.controller.signal_step_done()
         self.controller.signal_algo_done()
+        
+class Dijkstra(Algorithm):
+    def __init__(self, c, filename):
+        Algorithm.__init__(self, c, filename)
+        self.DS = Graph(filename)
 
+    def execute(self):
+        self.controller.signal_algo_start()
+        dist = []
+        vis = []
+        INF = 999
+        for i in range(self.DS.n):
+            dist.append(INF)
+            vis.append(0)
+        dist[self.DS.start] = 0
+        ss = SortedSet()
+        ss.add((0, self.DS.start))
+        while len(ss) > 0:
+            (cost, nod) = ss.pop(0)
+            if vis[nod] == 1:
+                continue
+            vis[nod] = 1
+            self.controller.wait_for_next_step()
+            file = open(self.DS.filename, "w")
+            file.write(str(self.DS.n) + " " + str(self.DS.m) + " " + str(self.DS.tp) + '\n')
+            self.DS.nodes[nod]['color'] = (255, 0, 0)
+            file.write(str(self.DS.nodes) + '\n')
+            file.write(str(self.DS.edges) + '\n')
+            file.close()
+            self.controller.signal_step_done()
+            
+            for nxt in self.DS.graph[nod]:
+                if vis[nxt[0]] == 0 and dist[nxt[0]] > dist[nod] + nxt[1]:
+                    dist[nxt[0]] = dist[nod] + nxt[1]
+                    ss.add((dist[nxt[0]], nxt[0]))
+            
+            self.controller.wait_for_next_step()
+            file = open("test.txt", "w")
+            file.write(str(self.DS.n) + "\n")
+            for k in range(self.DS.n):
+                file.write("{'content':" + str(dist[k]) + ", 'color':(100,100,100)}\n")
+            file.close()
+            self.controller.signal_step_done()
+        self.controller.wait_for_next_step()
+        for i in range(self.DS.n):
+            self.DS.nodes[i]['color'] = (112, 112, 112)
+        file = open(self.DS.filename, "w")
+        file.write(str(self.DS.n) + " " + str(self.DS.m) + " " + str(self.DS.tp) + '\n')
+        file.write(str(self.DS.nodes) + '\n')
+        file.write(str(self.DS.edges) + '\n')
+        file.close()
+        self.controller.signal_step_done()
+        self.controller.signal_algo_done()
+                    
+            
+        
 
             
             
