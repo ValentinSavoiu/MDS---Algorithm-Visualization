@@ -47,22 +47,66 @@ class Graph(DataStructure):
         if x >=0 and x < self.n:
             self.start = x
 
-    
-    def add_edge(self, id1, id2):
+    def add_edge_cost(self, id1, id2, cost = 1):
+        x = int(id1)
+        y = int(id2)
+        if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
+            if 'cost' in self.edges[1]:
+                new_edge = {'x': x, 'y': y, 'color': (77, 77, 77), 'cost': cost}
+                new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77), 'cost': cost}
+            else:
+                new_edge = {'x': x, 'y': y, 'color': (77, 77, 77)}
+                new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77)}
+            if self.tp == "undirected":
+                if new_edge not in self.edges and new_edge_rev not in self.edges:
+                    self.edges.append(new_edge)
+                    self.m += 1
+                    if x not in self.graph.keys():
+                        self.graph[x] = []
+                    if y not in self.graph.keys():
+                        self.graph[y] = []
+                    self.graph[y].append((x, cost))
+                    self.graph[x].append((y, cost))
+            else:
+                if new_edge not in self.edges:
+                    self.edges.append(new_edge)
+                    self.m += 1
+                    if x not in self.graph.keys():
+                        self.graph[x] = []
+                    if y not in self.graph.keys():
+                        self.graph[y] = []
+                    self.graph[x].append((y, cost))
+        file = open(self.filename, "w")
+        file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
+        file.write(str(self.nodes) + '\n')
+        file.write(str(self.edges) + '\n')
+        file.close()
+        
+    def add_edge(self, id1, id2, cost = 1):
         x = int(id1)
         y = int(id2)
         if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
             new_edge = {'x': x, 'y': y, 'color': (77, 77, 77)}
             new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77)}
-            if new_edge not in self.edges and new_edge_rev not in self.edges:
-                self.edges.append(new_edge)
-                self.m += 1
-                if x not in self.graph.keys():
-                    self.graph[x] = []
-                if y not in self.graph.keys():
-                    self.graph[y] = []
-                self.graph[y].append((x, 1))
-                self.graph[x].append((y, 1))
+            if self.tp == "undirected":
+                if new_edge not in self.edges and new_edge_rev not in self.edges:
+                    self.edges.append(new_edge)
+                    self.m += 1
+                    if x not in self.graph.keys():
+                        self.graph[x] = []
+                    if y not in self.graph.keys():
+                        self.graph[y] = []
+                    self.graph[y].append((x, cost))
+                    self.graph[x].append((y, cost))
+            else:
+                if new_edge not in self.edges:
+                    self.edges.append(new_edge)
+                    self.m += 1
+                    if x not in self.graph.keys():
+                        self.graph[x] = []
+                    if y not in self.graph.keys():
+                        self.graph[y] = []
+                    self.graph[x].append((y, cost))
         file = open(self.filename, "w")
         file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
         file.write(str(self.nodes) + '\n')
@@ -124,11 +168,14 @@ class Graph(DataStructure):
     
     def remove_edge(self, id1, id2):
         pos = -1
-        for i in range(self.m):
-            #print(int(self.edges[i]['x']), int(self.edges[i]['y']))
-            if (int(self.edges[i]['x']) == int(id1) and int(self.edges[i]['y']) == int(id2)) or (int(self.edges[i]['x']) == int(id2) and int(self.edges[i]['y']) == int(id1)):
-                pos = i
-        print(pos)
+        if self.tp == "undirected":
+            for i in range(self.m):
+                if (int(self.edges[i]['x']) == int(id1) and int(self.edges[i]['y']) == int(id2)) or (int(self.edges[i]['x']) == int(id2) and int(self.edges[i]['y']) == int(id1)):
+                    pos = i
+        else:
+            for i in range(self.m):
+                if int(self.edges[i]['x']) == int(id1) and int(self.edges[i]['y']) == int(id2):
+                    pos = i
         if pos >= 0:
             del self.edges[pos]
             self.m -= 1
@@ -316,10 +363,11 @@ class Dijkstra(Algorithm):
             file.close()
             self.controller.signal_step_done()
             
-            for nxt in self.DS.graph[nod]:
-                if vis[nxt[0]] == 0 and dist[nxt[0]] > dist[nod] + nxt[1]:
-                    dist[nxt[0]] = dist[nod] + nxt[1]
-                    ss.add((dist[nxt[0]], nxt[0]))
+            if nod in self.DS.graph.keys():
+                for nxt in self.DS.graph[nod]:
+                    if vis[nxt[0]] == 0 and dist[nxt[0]] > dist[nod] + nxt[1]:
+                        dist[nxt[0]] = dist[nod] + nxt[1]
+                        ss.add((dist[nxt[0]], nxt[0]))
             
             self.controller.wait_for_next_step()
             file = open("test.txt", "w")
@@ -329,6 +377,7 @@ class Dijkstra(Algorithm):
             file.close()
             self.controller.signal_step_done()
         self.controller.wait_for_next_step()
+        
         for i in range(self.DS.n):
             self.DS.nodes[i]['color'] = (112, 112, 112)
         file = open(self.DS.filename, "w")
