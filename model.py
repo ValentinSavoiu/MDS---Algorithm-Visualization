@@ -13,7 +13,10 @@ class Graph(DataStructure):
         l = line.split(' ')
         self.n = int(l[0])
         self.m = int(l[1])
-        self.tp = l[2][:10]
+        print(l[2])
+        print(len(l[2]))
+        self.tp = l[2][:len(l[2]) - 1]
+        print(self.tp)
         self.start = 0
         self.nodes = ast.literal_eval(file.readline())
         self.edges = ast.literal_eval(file.readline())
@@ -45,7 +48,7 @@ class Graph(DataStructure):
             self.start = x
 
     
-    def add_edge(self, id1, id2, cost = 1):
+    def add_edge(self, id1, id2):
         x = int(id1)
         y = int(id2)
         if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
