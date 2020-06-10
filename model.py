@@ -1,5 +1,6 @@
 import ast
 from sortedcontainers import SortedSet
+import random
 
 class DataStructure:
     def __init__(self, filename):
@@ -47,7 +48,7 @@ class Graph(DataStructure):
         if x >=0 and x < self.n:
             self.start = x
 
-    def add_edge_cost(self, id1, id2, cost = 1):
+    def add_edge(self, id1, id2, cost = 1):
         x = int(id1)
         y = int(id2)
         if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
@@ -81,37 +82,7 @@ class Graph(DataStructure):
         file.write(str(self.nodes) + '\n')
         file.write(str(self.edges) + '\n')
         file.close()
-        
-    def add_edge(self, id1, id2, cost = 1):
-        x = int(id1)
-        y = int(id2)
-        if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
-            new_edge = {'x': x, 'y': y, 'color': (77, 77, 77)}
-            new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77)}
-            if self.tp == "undirected":
-                if new_edge not in self.edges and new_edge_rev not in self.edges:
-                    self.edges.append(new_edge)
-                    self.m += 1
-                    if x not in self.graph.keys():
-                        self.graph[x] = []
-                    if y not in self.graph.keys():
-                        self.graph[y] = []
-                    self.graph[y].append((x, cost))
-                    self.graph[x].append((y, cost))
-            else:
-                if new_edge not in self.edges:
-                    self.edges.append(new_edge)
-                    self.m += 1
-                    if x not in self.graph.keys():
-                        self.graph[x] = []
-                    if y not in self.graph.keys():
-                        self.graph[y] = []
-                    self.graph[x].append((y, cost))
-        file = open(self.filename, "w")
-        file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
-        file.write(str(self.nodes) + '\n')
-        file.write(str(self.edges) + '\n')
-        file.close()
+
     
     def remove_element(self, id):
         x = int(id)
@@ -208,6 +179,13 @@ class Graph(DataStructure):
 class Vector(DataStructure):
     def __init__(self, filename):
         DataStructure.__init__(self, filename)
+        if self.filename == "random.txt":
+            file = open("random.txt", "w")
+            n = random.randint(1, 20)
+            file.write(str(n) + "\n")
+            for i in range(n):
+                file.write("{'content':" + str(random.randint(-100, 100)) + ", 'color':(100,100,100)}\n")
+            file.close()
         file = open(self.filename, "r")
         lines = file.readlines()
         self.sz = int(lines[0][0:1])
@@ -215,10 +193,17 @@ class Vector(DataStructure):
         for i in range(1,len(lines)):
             value = 0
             j = 11
+            pos = 1
+            if lines[i][j] == '-':
+                j = j + 1
+                pos = 0
             while lines[i][j].isdigit():
                 value = value * 10 + int(lines[i][j])
                 j = j + 1
-            self.list.append(value)
+            if pos == 1:
+                self.list.append(value)
+            else:
+                self.list.append(-value)
         file.close()
     
     def remove_element(self,id):
@@ -387,7 +372,7 @@ class Dijkstra(Algorithm):
         file.close()
         self.controller.signal_step_done()
         self.controller.signal_algo_done()
-                    
+
             
         
 
