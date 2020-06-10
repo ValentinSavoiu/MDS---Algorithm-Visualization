@@ -131,8 +131,7 @@ class Controller:
 	def handler_worker(self):
 		go_on = True
 		while self.cnttrig_msgs.empty() and go_on:
-			go_on = self.viewer.event_handler(True)
-			go_on = True # not yet implemented
+			go_on = self.viewer.event_handler(True, None)
 		msg = self.cnttrig_msgs.get()
 		self.cnttrig_msgs.task_done()
 
@@ -169,4 +168,9 @@ class Controller:
 		self.viewer.print_icons(False)
 		while (go_on):
 			self.print(False)
-			go_on = self.viewer.loop(self.filename, False, 'graph')
+			if isinstance(self.model.DS, Vector):
+				go_on = self.viewer.loop(self.filename, False, 'vector')
+			elif isinstance(self.model.DS, Graph):
+				go_on = self.viewer.loop(self.filename, False, 'graph')
+			else:
+				raise NotImplementedError('visualize error')
