@@ -181,7 +181,7 @@ class Vector(DataStructure):
         DataStructure.__init__(self, filename)
         if self.filename == "random.txt":
             file = open("random.txt", "w")
-            n = random.randint(1, 20)
+            n = random.randint(1, 10)
             file.write(str(n) + "\n")
             for i in range(n):
                 file.write("{'content':" + str(random.randint(-100, 100)) + ", 'color':(100,100,100)}\n")
