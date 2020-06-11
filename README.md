@@ -16,11 +16,11 @@ Pentru utilizare:
 
 Pentru notare:
 
-    backlog and user stories: https://trello.com/b/4lV36J6Y/algorithm-visualization
+backlog and user stories: https://trello.com/b/4lV36J6Y/algorithm-visualization
     
-    uml: https://drive.google.com/file/d/1TVnSt9vql4WTHPDxLxlgl-OTj3LIhNyh/view?usp=sharing
+uml: https://drive.google.com/file/d/1TVnSt9vql4WTHPDxLxlgl-OTj3LIhNyh/view?usp=sharing
     
-    bugfixing/issues: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/issues?q=is%3Aissue+is%3Aclosed 
+bugfixing/issues: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/issues?q=is%3Aissue+is%3Aclosed 
     
-    refactoring: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/commit/af4a86e994d9b9be4b89e645747cfcebfc1e9152
+refactoring: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/commit/af4a86e994d9b9be4b89e645747cfcebfc1e9152
 
