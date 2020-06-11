@@ -4,4 +4,4 @@
 {'content':0, 'color':(100,100,100)}
 {'content':0, 'color':(100,100,100)}
 {'content':0, 'color':(100,100,100)}
-{'content':15, 'color':(100,100,100)}
+{'content':2, 'color':(100,100,100)}
