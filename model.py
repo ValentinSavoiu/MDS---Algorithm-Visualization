@@ -7,17 +7,64 @@ class DataStructure:
         self.filename = filename
 
 class Graph(DataStructure):
-    def __init__(self, filename):
+    def __init__(self, filename, alg):
         DataStructure.__init__(self, filename)
+        if self.filename == "random.txt":
+            n = 6
+            nodes = [{'pos': (786, 578), 'color': (112, 112, 112)}, {'pos': (441, 470), 'color': (112, 112, 112)}, {'pos': (531, 160), 'color': (112, 112, 112)}, {'pos': (900, 83), 'color': (112, 112, 112)}, {'pos': (1318, 235), 'color': (112, 112, 112)}, {'pos': (1287, 493), 'color': (112, 112, 112)}]
+            m = random.randint(1, 10)
+            x = random.randint(0, 1)
+            edges = []
+            edges_cost = []
+            if x == 0:
+                t = "undirected"
+            else:
+                t = "directed"
+            cnt = m
+            while cnt > 0:
+                x = random.randint(0, 5)
+                y = random.randint(0, 5)
+                new_edge = {'x': x, 'y': y, 'color': (77, 77, 77)}
+                new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77)}
+                if alg == "dijkstra":
+                    c = random.randint(1, 50)
+                    new_edge_cost = {'x': x, 'y': y, 'color': (77, 77, 77), 'cost': c}
+                    new_edge_rev_cost = {'x': y, 'y': x, 'color': (77, 77, 77), 'cost': c}
+                if t == "directed":
+                    if new_edge in edges or x == y:
+                        continue
+                    else:
+                        edges.append(new_edge)
+                        if alg == "dijkstra":
+                            edges_cost.append(new_edge_cost)
+                        cnt -= 1
+                else:
+                    if new_edge in edges or new_edge_rev in edges or x == y:
+                        continue
+                    else:
+                        edges.append(new_edge)
+                        if alg == "dijkstra":
+                            edges_cost.append(new_edge_cost)
+                        cnt -= 1
+            if alg == "bfs":  
+                file = open(self.filename, "w")
+                file.write(str(n) + " " + str(m) + " " + str(t) + '\n')
+                file.write(str(nodes) + '\n')
+                file.write(str(edges) + '\n')
+                file.close()
+            else:
+                file = open(self.filename, "w")
+                file.write(str(n) + " " + str(m) + " " + str(t) + '\n')
+                file.write(str(nodes) + '\n')
+                file.write(str(edges_cost) + '\n')
+                file.close()
+            
         file = open(self.filename, "r")
         line = file.readline()
         l = line.split(' ')
         self.n = int(l[0])
         self.m = int(l[1])
-        print(l[2])
-        print(len(l[2]))
         self.tp = l[2][:len(l[2]) - 1]
-        print(self.tp)
         self.start = 0
         self.nodes = ast.literal_eval(file.readline())
         self.edges = ast.literal_eval(file.readline())
@@ -33,7 +80,6 @@ class Graph(DataStructure):
             else:
                 self.graph[x].append((y, 1))
             if self.tp == "undirected":
-                print("DA")
                 if y not in self.graph.keys():
                     self.graph[y] = []
                 if 'cost' in edge.keys():
@@ -285,7 +331,7 @@ class BubbleSort(Algorithm):
 class BFS(Algorithm):
     def __init__(self, c, filename):
         Algorithm.__init__(self, c, filename)
-        self.DS = Graph(filename)
+        self.DS = Graph(filename, "bfs")
 
     def execute(self):
         self.controller.signal_algo_start()
@@ -322,24 +368,26 @@ class BFS(Algorithm):
 class Dijkstra(Algorithm):
     def __init__(self, c, filename):
         Algorithm.__init__(self, c, filename)
-        self.DS = Graph(filename)
+        self.DS = Graph(filename, "dijkstra")
 
     def execute(self):
         self.controller.signal_algo_start()
         dist = []
         vis = []
-        INF = 999
+        INF = 9999
         for i in range(self.DS.n):
             dist.append(INF)
             vis.append(0)
         dist[self.DS.start] = 0
         ss = SortedSet()
         ss.add((0, self.DS.start))
+        finish = []
         while len(ss) > 0:
             (cost, nod) = ss.pop(0)
             if vis[nod] == 1:
                 continue
             vis[nod] = 1
+            finish.append(nod)
             self.controller.wait_for_next_step()
             file = open(self.DS.filename, "w")
             file.write(str(self.DS.n) + " " + str(self.DS.m) + " " + str(self.DS.tp) + '\n')
@@ -348,10 +396,11 @@ class Dijkstra(Algorithm):
             file.write(str(self.DS.edges) + '\n')
             file.close()
             self.controller.signal_step_done()
-            
+            update = []
             if nod in self.DS.graph.keys():
                 for nxt in self.DS.graph[nod]:
                     if vis[nxt[0]] == 0 and dist[nxt[0]] > dist[nod] + nxt[1]:
+                        update.append(nxt[0])
                         dist[nxt[0]] = dist[nod] + nxt[1]
                         ss.add((dist[nxt[0]], nxt[0]))
             
@@ -359,17 +408,31 @@ class Dijkstra(Algorithm):
             file = open("test.txt", "w")
             file.write(str(self.DS.n) + "\n")
             for k in range(self.DS.n):
-                file.write("{'content':" + str(dist[k]) + ", 'color':(100,100,100)}\n")
+                if k in finish:
+                    file.write("{'content':" + str(dist[k]) + ", 'color':(255,0,0)}\n")
+                elif k in update:
+                    file.write("{'content':" + str(dist[k]) + ", 'color':(0,255,100)}\n")
+                else:
+                    file.write("{'content':" + str(dist[k]) + ", 'color':(100,100,100)}\n")
             file.close()
             self.controller.signal_step_done()
+            
+            
         self.controller.wait_for_next_step()
-        
         for i in range(self.DS.n):
             self.DS.nodes[i]['color'] = (112, 112, 112)
         file = open(self.DS.filename, "w")
         file.write(str(self.DS.n) + " " + str(self.DS.m) + " " + str(self.DS.tp) + '\n')
         file.write(str(self.DS.nodes) + '\n')
         file.write(str(self.DS.edges) + '\n')
+        file.close()
+        self.controller.signal_step_done()
+        
+        self.controller.wait_for_next_step()
+        file = open("test.txt", "w")
+        file.write(str(self.DS.n) + "\n")
+        for k in range(self.DS.n):
+            file.write("{'content':" + str(dist[k]) + ", 'color':(100,100,100)}\n")
         file.close()
         self.controller.signal_step_done()
         self.controller.signal_algo_done()
