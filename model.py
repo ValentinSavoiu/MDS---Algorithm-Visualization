@@ -181,14 +181,14 @@ class Vector(DataStructure):
         DataStructure.__init__(self, filename)
         if self.filename == "random.txt":
             file = open("random.txt", "w")
-            n = random.randint(1, 10)
+            n = random.randint(1, 20)
             file.write(str(n) + "\n")
             for i in range(n):
                 file.write("{'content':" + str(random.randint(-100, 100)) + ", 'color':(100,100,100)}\n")
             file.close()
         file = open(self.filename, "r")
         lines = file.readlines()
-        self.sz = int(lines[0][0:1])
+        self.sz = int(lines[0][:len(lines[0]) - 1])
         self.list = []
         for i in range(1,len(lines)):
             value = 0
@@ -217,13 +217,14 @@ class Vector(DataStructure):
             file.close()
     
     def add_element(self,value,position):
-        self.list.insert(position,value)
-        self.sz = self.sz + 1
-        file = open(self.filename, "w")
-        file.write(str(self.sz) + "\n")
-        for i in range(self.sz):
-            file.write("{'content':" + str(self.list[i]) + ", 'color':(100,100,100)}\n")
-        file.close()
+        if self.sz < 10:
+            self.list.insert(position,value)
+            self.sz = self.sz + 1
+            file = open(self.filename, "w")
+            file.write(str(self.sz) + "\n")
+            for i in range(self.sz):
+                file.write("{'content':" + str(self.list[i]) + ", 'color':(100,100,100)}\n")
+            file.close()
     
     def reverse_array(self):
         self.list.reverse()
