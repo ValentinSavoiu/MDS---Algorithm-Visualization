@@ -120,7 +120,7 @@ class Viewer:
         fn = meniu.get_input_data()['filename']
         if fn == '':
             self.menuRunning = False
-            self.controller.choose_algorithm(self.algorithm, 'test.txt')
+            self.controller.choose_algorithm(self.algorithm, 'random.txt')
             return
         mypath = os.path.join('inputs', fn)
         if os.path.exists(mypath) and os.path.isfile(mypath):
