@@ -8,6 +8,7 @@ class DataStructure:
 
 class Graph(DataStructure):
     def __init__(self, filename, alg):
+        self.alg = alg
         DataStructure.__init__(self, filename)
         if self.filename == "random.txt":
             n = 6
@@ -98,7 +99,7 @@ class Graph(DataStructure):
         x = int(id1)
         y = int(id2)
         if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
-            if 'cost' in self.edges[1]:
+            if self.alg == "dijkstra":
                 new_edge = {'x': x, 'y': y, 'color': (77, 77, 77), 'cost': cost}
                 new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77), 'cost': cost}
             else:
@@ -132,44 +133,43 @@ class Graph(DataStructure):
     
     def remove_element(self, id):
         x = int(id)
-        if len(self.nodes) > 1:
-            self.n -= 1
-            new_edges = []
-            for edge in self.edges:
-                if edge['x'] != x and edge['y'] != x:
-                    if edge['x'] > x:
-                        edge['x'] -= 1
-                    if edge['y'] > x:
-                        edge['y'] -= 1
-                    new_edges.append(edge)
+        self.n -= 1
+        new_edges = []
+        for edge in self.edges:
+            if edge['x'] != x and edge['y'] != x:
+                if edge['x'] > x:
+                    edge['x'] -= 1
+                if edge['y'] > x:
+                    edge['y'] -= 1
+                new_edges.append(edge)
+            else:
+                self.m -= 1
+        del self.nodes[x]
+        self.edges = new_edges
+        self.graph = {}
+        for edge in self.edges:
+            x = int(edge['x'])
+            y = int(edge['y'])
+            if x not in self.graph.keys():
+                self.graph[x] = []
+                if 'cost' in edge.keys():
+                    c = int(edge['cost'])
+                    self.graph[x].append((y, c))
                 else:
-                    self.m -= 1
-            del self.nodes[x]
-            self.edges = new_edges
-            self.graph = {}
-            for edge in self.edges:
-                x = int(edge['x'])
-                y = int(edge['y'])
-                if x not in self.graph.keys():
-                    self.graph[x] = []
-                    if 'cost' in edge.keys():
-                        c = int(edge['cost'])
-                        self.graph[x].append((y, c))
-                    else:
-                        self.graph[x].append((y, 1))
-                if self.tp == "undirected":
-                    if y not in self.graph.keys():
-                        self.graph[y] = []
-                    if 'cost' in edge.keys():
-                        c = int(edge['cost'])
-                        self.graph[y].append((x, c))
-                    else:
-                        self.graph[y].append((x, 1))
-            file = open(self.filename, "w")
-            file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
-            file.write(str(self.nodes) + '\n')
-            file.write(str(self.edges) + '\n')
-            file.close()
+                    self.graph[x].append((y, 1))
+            if self.tp == "undirected":
+                if y not in self.graph.keys():
+                    self.graph[y] = []
+                if 'cost' in edge.keys():
+                    c = int(edge['cost'])
+                    self.graph[y].append((x, c))
+                else:
+                    self.graph[y].append((x, 1))
+        file = open(self.filename, "w")
+        file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
+        file.write(str(self.nodes) + '\n')
+        file.write(str(self.edges) + '\n')
+        file.close()
     
     def add_element(self, value, position):
         x = position[0]
