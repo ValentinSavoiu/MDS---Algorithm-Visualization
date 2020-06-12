@@ -144,13 +144,12 @@ class Viewer:
         imgName = 'play_medium.png' if algRunning == False else 'pause_medium.png'
         img = pygame.image.load(os.path.join('icons', imgName))
         top = self.controlRect.top
-        self.pausePlay = pygame.Rect(int(self.width // 2), top, img.get_width(), img.get_height())
+        self.pausePlay = pygame.Rect(int(self.width // 2 - img.get_width() // 2), top, img.get_width(), img.get_height())
         self.screen.blit(img, self.pausePlay)
         imgName = 'one_step_medium.png'
         img = pygame.image.load(os.path.join('icons', imgName))
         self.oneStep = pygame.Rect(self.pausePlay.left - img.get_width(), self.pausePlay.top, img.get_width(), img.get_height())
         self.screen.blit(img, self.oneStep)
-
 
         imgName = 'slow_medium.png'
         img = pygame.image.load(os.path.join('icons', imgName))
@@ -162,6 +161,15 @@ class Viewer:
         self.fast = pygame.Rect(self.pausePlay.right, self.pausePlay.top, img.get_width(), img.get_height())
         self.screen.blit(img, self.fast)
         pygame.display.flip()
+
+        if self.controller.state == 'stopped':
+            imgName = 'back_menu.png'
+            img = pygame.image.load(os.path.join('icons', imgName))
+            self.back = pygame.Rect(self.fast.right, self.pausePlay.top, img.get_width(), img.get_height())
+            self.screen.blit(img, self.back)
+            pygame.display.flip()
+
+
     
     def clear_array(self, idx = 0) :
         if idx > 1:
@@ -227,7 +235,7 @@ class Viewer:
     def set_source(self, meniu, i):
         self.menuRunning = False
         self.running = False
-        self.graphMenuRunning = False
+        #self.graphMenuRunning = False
         val = self.get_value(meniu, 'val' + str(i))
         self.controller.set_source(val)
 
