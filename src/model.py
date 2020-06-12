@@ -317,7 +317,7 @@ class BubbleSort(Algorithm):
                 file.write("{'content':" + str(self.DS.list[j]) + ", 'color':(255,0,0)}\n")
                 file.write("{'content':" + str(self.DS.list[j+1]) + ", 'color':(255,0,0)}\n")
                 for k in range(j + 2,self.DS.sz):
-                    file.write("{'content': " + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
+                    file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
                 file.close()
                 self.controller.signal_step_done()
                 if self.DS.list[j] > self.DS.list[j + 1]:

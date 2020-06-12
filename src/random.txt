@@ -1,17 +1,10 @@
-16
-{'content':-49, 'color':(100,100,100)}
-{'content':47, 'color':(100,100,100)}
-{'content':-79, 'color':(100,100,100)}
-{'content':-77, 'color':(100,100,100)}
-{'content':54, 'color':(100,100,100)}
-{'content':71, 'color':(100,100,100)}
-{'content':-36, 'color':(100,100,100)}
-{'content':-51, 'color':(100,100,100)}
-{'content':-89, 'color':(100,100,100)}
-{'content':93, 'color':(100,100,100)}
-{'content':-14, 'color':(100,100,100)}
-{'content':-5, 'color':(100,100,100)}
-{'content':-22, 'color':(100,100,100)}
-{'content':8, 'color':(100,100,100)}
-{'content':45, 'color':(100,100,100)}
+9
 {'content':61, 'color':(100,100,100)}
+{'content':22, 'color':(100,100,100)}
+{'content':50, 'color':(100,100,100)}
+{'content':-20, 'color':(100,100,100)}
+{'content':-35, 'color':(100,100,100)}
+{'content':33, 'color':(100,100,100)}
+{'content':7, 'color':(100,100,100)}
+{'content':-98, 'color':(100,100,100)}
+{'content':43, 'color':(100,100,100)}

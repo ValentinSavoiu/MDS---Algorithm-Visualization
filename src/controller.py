@@ -25,6 +25,8 @@ class Controller:
         self.speeds       = (0.125, 0.25, 0.5, 1, 2)
         self.speed_index  = 2
         self.again = False
+        self.last_one_step = 0
+        self.last_play_pause = 0
 
     def change_speed(self, direction):
         if (self.speed_index == 0 and direction < 0) or (self.speed_index == (len(self.speeds) - 1) and direction > 0):
@@ -63,6 +65,8 @@ class Controller:
         self.speeds       = (0.125, 0.25, 0.5, 1, 2)
         self.speed_index  = 2
         self.again = False
+        self.last_one_step = 0
+        self.last_play_pause = 0
 
 
     def set_source(self, value):
@@ -112,7 +116,6 @@ class Controller:
         #print("main: joined cnttrig")
         self.modview_msgs.join()
         #print("main: joined modview_msgs")
-        self.state = 'stopped'
 
 
     def play_or_pause(self):
@@ -160,6 +163,9 @@ class Controller:
         self.modview_msgs.task_done()
 
     def change_state(self):
+        new_play_pause = time.time()
+        if new_play_pause - self.last_play_pause < 0.1: # don't spam me
+            return
         if (self.state == 'paused'):
             #print("Change state: I was called to play")
             self.viewer.print_icons(True)
@@ -170,10 +176,13 @@ class Controller:
             self.trigger_msgs.put('pause')
         if self.cnttrig_msgs.empty():
             self.trigger_msgs.join()
-        time.sleep(0.1)
+        self.last_play_pause = new_play_pause
 
     def run_one_step(self):
         #print("ONE STEP")
+        new_one_step = time.time()
+        if new_one_step - self.last_one_step < 0.5: # don't spam me
+            return
         if self.state == 'running':
             return
         self.one_step_msgs.put('one step')
@@ -187,6 +196,7 @@ class Controller:
             self.play_or_pause()
             self.trigger_msgs.join()
         self.one_step_msgs.join()
+        self.last_one_step = new_one_step
 
     def handler_worker(self):
         go_on = True
@@ -214,7 +224,8 @@ class Controller:
         self.cleanup(self.viewmod_msgs)
         self.modview_msgs.join()
         self.running_msgs.task_done()
-    #################################
+        self.state = 'stopped'
+     #################################
 
     def print(self, algRunning):
         if isinstance(self.model.DS, Vector):

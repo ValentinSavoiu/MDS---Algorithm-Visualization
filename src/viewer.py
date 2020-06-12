@@ -169,7 +169,8 @@ class Viewer:
             self.screen.blit(img, self.back)
             pygame.display.flip()
 
-
+    def dist(self, p ,q):
+        return math.sqrt(sum((px - qx) ** 2.0 for px, qx in zip(p, q)))
     
     def clear_array(self, idx = 0) :
         if idx > 1:
@@ -179,7 +180,7 @@ class Viewer:
     
     def clear_graph(self):
         pygame.draw.rect(self.screen, white, self.graphRect, 0)
-        #pygame.display.flip()
+        pygame.display.flip()
 
     def clear_icons(self):
         pygame.draw.rect(self.screen, white, self.controlRect, 0)
@@ -335,7 +336,7 @@ class Viewer:
                     self.controller.change_speed(1)
                 
                 if self.back.collidepoint(posi) and self.controller.state == 'stopped':
-                    #print("start over requested")
+                    print("start over requested")
                     self.controller.request_start_over()
                     return False
 
@@ -397,8 +398,8 @@ class Viewer:
     def arrow(self, lcolor, tricolor, start, end, trirad):
         pygame.draw.line(self.screen, lcolor, start, end, 3)
         rotation = math.degrees(math.atan2(start[1] - end[1], end[0] - start[0])) + 90
-        end = (end[0] - 0.4 * math.dist(start, end) * math.sin(math.radians(rotation)),
-               end[1] - 0.4 * math.dist(start, end) * math.cos(math.radians(rotation)))
+        end = (end[0] - 0.4 * self.dist(start, end) * math.sin(math.radians(rotation)),
+               end[1] - 0.4 * self.dist(start, end) * math.cos(math.radians(rotation)))
         pygame.draw.polygon(self.screen, tricolor, (
                                             (end[0] + trirad * math.sin(math.radians(rotation)), 
                                             end[1] + trirad*math.cos(math.radians(rotation))), 
@@ -473,15 +474,15 @@ class Viewer:
         pygame.quit()
 
     def loop(self, filename, algRunning, changeable = 'vector'):
-        #print("visualizer called")
+        print("visualizer called")
         self.controller.print(algRunning)
         self.running = True
         while (self.running == True):
             go_on = self.event_handler(algRunning, changeable) # returns False if ESC pressed
             if (go_on == False):
-                #print("exited visualize loop by ESC")
+                print("exited visualize loop by ESC")
                 return False
-        #print("exited visualize loop by natural causes")
+        print("exited visualize loop by natural causes")
         return True
 
 if __name__ == "__main__":
