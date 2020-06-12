@@ -1,4 +1,6 @@
 from controller import *
+import os
 
-a = Controller('test.txt')
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+a = Controller()
 a.visualize()
