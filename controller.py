@@ -7,7 +7,8 @@
 from model import *
 from viewer import *
 
-import threading, time, queue
+import threading, time, queue, random, os, math
+from shutil import copyfile
 
 class Controller:
 	def __init__(self, filename):
@@ -19,7 +20,8 @@ class Controller:
 		self.viewmod_msgs = queue.Queue() # viewer to model communication
 		self.modview_msgs = queue.Queue() # model to viewer communication
 		self.running_msgs = queue.Queue() # central controller <-> model communication
-		self.state        = 'running'	  # running or paused
+		self.one_step_msgs = queue.Queue()
+		self.state        = 'stopped'	  # running or paused
 		self.speeds		  = (0.125, 0.25, 0.5, 1, 2)
 		self.speed_index  = 2
 
@@ -39,7 +41,12 @@ class Controller:
 			self.model = Dijkstra(self, self.filename)
 		else:
 			raise NotImplementedError("controller.choose_algorithm: Unknown algorithm {}".format(id))
-	
+
+	def set_source(self, value):
+		print("setting source to {}".format(value))
+		self.model.DS.set_source(value)
+		self.run_algorithm()
+
 	def add_element(self, value, position):
 		self.model.DS.add_element(value, position)
 
@@ -52,6 +59,9 @@ class Controller:
 	def remove_edge(self, id1, id2):
 		self.model.DS.remove_edge(id1, id2)
 
+	def full_random(self):
+		id = random.randint(0, 2)
+		self.choose_algorithm(id, "random.txt")
 
 	def cleanup(self, q):
 		while not q.empty():
@@ -59,6 +69,9 @@ class Controller:
 			q.task_done()
 
 	def run_algorithm(self):
+		self.state = 'running'
+		copyfile(self.filename, self.filename + ".bak")
+		self.viewer.print_icons(True)
 		M = threading.Thread(target=self.model.execute, args=())
 		V = threading.Thread(target=self.array_worker, args=())
 		T = threading.Thread(target=self.handler_worker, args=()) # trigger thread
@@ -75,10 +88,10 @@ class Controller:
 		self.cnttrig_msgs.put('end it')
 		self.cnttrig_msgs.join()
 		print("main: joined cnttrig")
-		self.viewmod_msgs.join()
-		print("main: viewmod")
 		self.modview_msgs.join()
 		print("main: joined modview_msgs")
+		self.state = 'stopped'
+
 
 	def play_or_pause(self):
 		if self.state == 'paused':
@@ -87,9 +100,15 @@ class Controller:
 			state = self.trigger_msgs.get()
 			if state == 'paused':
 				raise Exception('Was asked to pause when already paused, get this checked')
+			elif state == 'quit':
+				self.viewmod_msgs.put('quit')
+				self.state = 'running'
+				self.trigger_msgs.task_done()
+				return
 			self.state = 'running'
 			self.trigger_msgs.task_done()
 		elif self.state == 'running' and not self.trigger_msgs.empty():
+			print("pausing!!")
 			state = self.trigger_msgs.get()
 			if state == 'play':
 				raise Exception('Was asked to play when already running, get this checked')
@@ -107,9 +126,15 @@ class Controller:
 			self.print(False)
 			time.sleep(self.speeds[self.speed_index])
 			self.modview_msgs.task_done()
+
 			self.viewmod_msgs.put('do next')
 			self.viewmod_msgs.join()
 			model_msg = self.modview_msgs.get()
+			if not self.one_step_msgs.empty() and self.state == 'running':
+				self.one_step_msgs.get()
+				self.trigger_msgs.put('pause')
+				self.viewer.print_icons(False)
+				self.one_step_msgs.task_done()
 		self.modview_msgs.task_done()
 
 	def change_state(self):
@@ -118,15 +143,27 @@ class Controller:
 			self.viewer.print_icons(True)
 			self.trigger_msgs.put('play')
 		else:
-			print("Change state: I was called to pause")
+			print(f"{self.state} Change state: I was called to pause")
 			self.viewer.print_icons(False)
 			self.trigger_msgs.put('pause')
-		self.trigger_msgs.join()
+		if self.cnttrig_msgs.empty():
+			self.trigger_msgs.join()
 		time.sleep(0.1)
 
 	def run_one_step(self):
-		print("One step called")
-		pass
+		if self.state == 'running':
+			return
+		self.one_step_msgs.put('one step')
+		print("added one step task")
+		if self.state == 'stopped':
+			self.run_algorithm()
+		elif self.state == 'paused':
+			print("\tbut currently stopped")
+			self.trigger_msgs.put('play')
+			self.viewer.print_icons(True)
+			self.play_or_pause()
+			self.trigger_msgs.join()
+		self.one_step_msgs.join()
 
 	def handler_worker(self):
 		go_on = True
@@ -139,11 +176,12 @@ class Controller:
 	def wait_for_next_step(self):
 		while self.viewmod_msgs.empty():
 			pass
-		msg = self.viewmod_msgs.get()
+		return self.viewmod_msgs.get()
 	def signal_step_done(self):
 		self.viewmod_msgs.task_done()
 		self.modview_msgs.join()
 		self.modview_msgs.put('print')
+
 	def signal_algo_start(self):
 		self.running_msgs.get()
 	def signal_algo_done(self):
@@ -153,6 +191,9 @@ class Controller:
 		self.cleanup(self.viewmod_msgs)
 		self.modview_msgs.join()
 		self.running_msgs.task_done()
+	def model_quit(self, file):
+		file.close()
+		self.signal_algo_done()
 	#################################
 
 	def print(self, algRunning):
@@ -160,13 +201,23 @@ class Controller:
 			self.viewer.print_array(self.filename, algRunning)
 		elif isinstance(self.model.DS, Graph):
 			self.viewer.print_graph(self.filename, algRunning)
+			if isinstance(self.model, Dijkstra):
+				self.viewer.print_array("test.txt", algRunning)
 		else:
 			raise NotImplementedError('idk what you want me to print man')
+
+	def restore_file(self):
+		bak = self.filename + ".bak"
+		if os.path.isfile(bak):
+			copyfile(bak, self.filename)
+			os.remove(bak)
+
 
 	def visualize(self):
 		go_on = True
 		self.viewer.print_icons(False)
 		while (go_on):
+			print(threading.active_count())
 			self.print(False)
 			if isinstance(self.model.DS, Vector):
 				go_on = self.viewer.loop(self.filename, False, 'vector')
@@ -174,3 +225,4 @@ class Controller:
 				go_on = self.viewer.loop(self.filename, False, 'graph')
 			else:
 				raise NotImplementedError('visualize error')
+		self.restore_file()
