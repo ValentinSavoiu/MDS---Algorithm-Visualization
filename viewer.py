@@ -302,7 +302,7 @@ class Viewer:
 
         events = pygame.event.get()
         for event in events:
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            if (event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)) and self.controller.state == 'stopped':
                 self.running = False
                 return False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
