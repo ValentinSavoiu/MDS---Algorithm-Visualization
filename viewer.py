@@ -97,17 +97,17 @@ class Viewer:
         meniu = self.make_menu(bgfunn = self.main_background, dp = True)
         self.algorithm = 0
         meniu.add_button('Start', self.choose_algorithm, meniu)
-        meniu.add_button('Feeling lucky', self.full_random)
+        meniu.add_button('Alege aleator', self.full_random)
         meniu.add_selector('',
                                [('Bubblesort', 0),
                                 ('BFS', 1),
                                 ('Djikstra', 2)],
                                onchange=self.change_algorithm,
                                selector_id='select_difficulty')
-        meniu.add_text_input("Filename: ", default='', textinput_id='filename')
-        meniu.add_button('View source code', self.github)
-        meniu.add_button('More about pygame', self.visit_pygame)
-        meniu.add_button('Help', self.help)
+        meniu.add_text_input("Numele fisierului: ", default='', textinput_id='filename')
+        meniu.add_button('Vezi codul sursa', self.github)
+        meniu.add_button('Mai multe despre pygame', self.visit_pygame)
+        meniu.add_button('Ajutor', self.help)
         meniu.set_fps(60)
         self.run_menu(meniu)
         
@@ -289,8 +289,8 @@ class Viewer:
             self.meniu.add_text_input("Nod2:", default='0', textinput_id='val2', input_type='__pygameMenu_input_int__')
             if self.algorithm == 2:
                 self.meniu.add_text_input("Cost:", default='1', textinput_id='cost', input_type='__pygameMenu_input_int__')
-            self.meniu.add_button("Sterge nod 1", self.remove_graph_element, self.meniu, 1)
-            self.meniu.add_button("Sterge nod 2", self.remove_graph_element, self.meniu, 2)
+            self.meniu.add_button("Sterge Nod1", self.remove_graph_element, self.meniu, 1)
+            self.meniu.add_button("Sterge Nod2", self.remove_graph_element, self.meniu, 2)
             self.meniu.add_button("Adauga muchie intre Nod1 si Nod2", self.add_edge, self.meniu)
             self.meniu.add_button("Sterge muchia dintre Nod1 si Nod2", self.remove_edge, self.meniu)
             self.meniu.add_button("Nod1 start parcurgere", self.set_source, self.meniu, 1)
