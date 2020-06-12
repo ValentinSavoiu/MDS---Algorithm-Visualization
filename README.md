@@ -33,3 +33,4 @@ bugfixing/issues: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualizatio
     
 refactoring: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/commit/af4a86e994d9b9be4b89e645747cfcebfc1e9152
 
+build tool: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/releases/tag/v1.1
