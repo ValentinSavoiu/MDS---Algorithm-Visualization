@@ -27,7 +27,7 @@ class Viewer:
         webbrowser.open('https://www.pygame.org/news', new=0, autoraise=True)
 
     def help(self):
-        webbrowser.open('https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/blob/graph_experimental/README.md', new=0, autoraise=True)
+        webbrowser.open('https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/blob/master/README.md', new=0, autoraise=True)
 
     def full_random(self):
         self.menuRunning = False
@@ -97,17 +97,17 @@ class Viewer:
         meniu = self.make_menu(bgfunn = self.main_background, dp = True)
         self.algorithm = 0
         meniu.add_button('Start', self.choose_algorithm, meniu)
-        meniu.add_button('Feeling lucky', self.full_random)
+        meniu.add_button('Feeling Lucky', self.full_random)
         meniu.add_selector('',
                                [('Bubblesort', 0),
                                 ('BFS', 1),
                                 ('Djikstra', 2)],
                                onchange=self.change_algorithm,
                                selector_id='select_difficulty')
-        meniu.add_text_input("Filename: ", default='', textinput_id='filename')
-        meniu.add_button('View source code', self.github)
-        meniu.add_button('More about pygame', self.visit_pygame)
-        meniu.add_button('Help', self.help)
+        meniu.add_text_input("Numele fisierului: ", default='', textinput_id='filename')
+        meniu.add_button('Vezi codul sursa', self.github)
+        meniu.add_button('Mai multe despre pygame', self.visit_pygame)
+        meniu.add_button('Ajutor', self.help)
         meniu.set_fps(60)
         self.run_menu(meniu)
         
@@ -179,7 +179,7 @@ class Viewer:
     
     def clear_graph(self):
         pygame.draw.rect(self.screen, white, self.graphRect, 0)
-        pygame.display.flip()
+        #pygame.display.flip()
 
     def clear_icons(self):
         pygame.draw.rect(self.screen, white, self.controlRect, 0)
@@ -289,8 +289,8 @@ class Viewer:
             self.meniu.add_text_input("Nod2:", default='0', textinput_id='val2', input_type='__pygameMenu_input_int__')
             if self.algorithm == 2:
                 self.meniu.add_text_input("Cost:", default='1', textinput_id='cost', input_type='__pygameMenu_input_int__')
-            self.meniu.add_button("Sterge nod 1", self.remove_graph_element, self.meniu, 1)
-            self.meniu.add_button("Sterge nod 2", self.remove_graph_element, self.meniu, 2)
+            self.meniu.add_button("Sterge Nod1", self.remove_graph_element, self.meniu, 1)
+            self.meniu.add_button("Sterge Nod2", self.remove_graph_element, self.meniu, 2)
             self.meniu.add_button("Adauga muchie intre Nod1 si Nod2", self.add_edge, self.meniu)
             self.meniu.add_button("Sterge muchia dintre Nod1 si Nod2", self.remove_edge, self.meniu)
             self.meniu.add_button("Nod1 start parcurgere", self.set_source, self.meniu, 1)
@@ -302,7 +302,7 @@ class Viewer:
 
         events = pygame.event.get()
         for event in events:
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            if (event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)) and self.controller.state == 'stopped':
                 self.running = False
                 return False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
@@ -324,7 +324,7 @@ class Viewer:
                         self.running = False
                     return True
 
-                if self.oneStep.collidepoint(posi) and self.controller.state == 'stopped':
+                if self.oneStep.collidepoint(posi):
                     self.controller.run_one_step()
 
                 # 1 = faster, -1 = slower
@@ -334,8 +334,8 @@ class Viewer:
                 if self.slow.collidepoint(posi):
                     self.controller.change_speed(1)
                 
-                if self.back.collidepoint(posi):
-                    print("start over requested")
+                if self.back.collidepoint(posi) and self.controller.state == 'stopped':
+                    #print("start over requested")
                     self.controller.request_start_over()
                     return False
 
@@ -473,15 +473,15 @@ class Viewer:
         pygame.quit()
 
     def loop(self, filename, algRunning, changeable = 'vector'):
-        print("visualizer called")
+        #print("visualizer called")
         self.controller.print(algRunning)
         self.running = True
         while (self.running == True):
             go_on = self.event_handler(algRunning, changeable) # returns False if ESC pressed
             if (go_on == False):
-                print("exited visualize loop by ESC")
+                #print("exited visualize loop by ESC")
                 return False
-        print("exited visualize loop by natural causes")
+        #print("exited visualize loop by natural causes")
         return True
 
 if __name__ == "__main__":

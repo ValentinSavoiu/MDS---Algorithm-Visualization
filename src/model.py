@@ -305,9 +305,10 @@ class BubbleSort(Algorithm):
     def execute(self):
         self.controller.signal_algo_start()
         ok = 0
+        cnt = 0
         while ok == 0:
             ok = 1
-            for j in range(self.DS.sz-1):
+            for j in range(self.DS.sz - cnt - 1):
                 self.controller.wait_for_next_step()
                 file = open(self.DS.filename, "w")
                 file.write(str(self.DS.sz) + "\n")
@@ -331,6 +332,7 @@ class BubbleSort(Algorithm):
                         file.write("{'content':" + str(self.DS.list[k]) + ", 'color':(100,100,100)}\n")
                     file.close()
                     self.controller.signal_step_done()
+            cnt += 1
         self.controller.wait_for_next_step()
         file = open(self.DS.filename,"w")
         file.write(str(self.DS.sz)+"\n")
@@ -448,10 +450,3 @@ class Dijkstra(Algorithm):
         file.close()
         self.controller.signal_step_done()
         self.controller.signal_algo_done()
-
-            
-        
-
-            
-            
-

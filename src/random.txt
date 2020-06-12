@@ -1,18 +1,17 @@
-17
-{'content':-61, 'color':(100,100,100)}
-{'content':-15, 'color':(100,100,100)}
-{'content':-63, 'color':(100,100,100)}
-{'content':29, 'color':(100,100,100)}
-{'content':-40, 'color':(100,100,100)}
-{'content':-47, 'color':(100,100,100)}
-{'content':-91, 'color':(100,100,100)}
-{'content':81, 'color':(100,100,100)}
-{'content':-96, 'color':(100,100,100)}
-{'content':20, 'color':(100,100,100)}
-{'content':-11, 'color':(100,100,100)}
-{'content':87, 'color':(100,100,100)}
-{'content':-62, 'color':(100,100,100)}
-{'content':79, 'color':(100,100,100)}
-{'content':27, 'color':(100,100,100)}
-{'content':-7, 'color':(100,100,100)}
+16
+{'content':-49, 'color':(100,100,100)}
+{'content':47, 'color':(100,100,100)}
+{'content':-79, 'color':(100,100,100)}
 {'content':-77, 'color':(100,100,100)}
+{'content':54, 'color':(100,100,100)}
+{'content':71, 'color':(100,100,100)}
+{'content':-36, 'color':(100,100,100)}
+{'content':-51, 'color':(100,100,100)}
+{'content':-89, 'color':(100,100,100)}
+{'content':93, 'color':(100,100,100)}
+{'content':-14, 'color':(100,100,100)}
+{'content':-5, 'color':(100,100,100)}
+{'content':-22, 'color':(100,100,100)}
+{'content':8, 'color':(100,100,100)}
+{'content':45, 'color':(100,100,100)}
+{'content':61, 'color':(100,100,100)}
