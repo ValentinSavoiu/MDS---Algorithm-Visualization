@@ -13,6 +13,7 @@ In meniul initial, selectati algoritmul dorit si introduceti un nume de fisier. 
 In general, fisierele care incep cu 'v' contin vectori si fisierele care incep cu 'g' contin grafuri
 
 -- Modificarea vectorilor
+
     Pentru a modifica vectorul, dati click pe un element. Vi se vor da optiunile de a sterge elementul, a adauga un element in stanga sau in dreapta lui,
     
 sau de a inversa ordinea elementelor din vector
