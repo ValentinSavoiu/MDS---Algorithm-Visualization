@@ -96,41 +96,41 @@ class Graph(DataStructure):
             self.start = x
 
     def add_edge(self, id1, id2, cost = 1):
-        x = int(id1)
-        y = int(id2)
-        if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
-            if self.alg == "dijkstra":
-                new_edge = {'x': x, 'y': y, 'color': (77, 77, 77), 'cost': cost}
-                new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77), 'cost': cost}
-            else:
-                new_edge = {'x': x, 'y': y, 'color': (77, 77, 77)}
-                new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77)}
-            if self.tp == "undirected":
-                if new_edge not in self.edges and new_edge_rev not in self.edges:
-                    self.edges.append(new_edge)
-                    self.m += 1
-                    if x not in self.graph.keys():
-                        self.graph[x] = []
-                    if y not in self.graph.keys():
-                        self.graph[y] = []
-                    self.graph[y].append((x, cost))
-                    self.graph[x].append((y, cost))
-            else:
-                if new_edge not in self.edges:
-                    self.edges.append(new_edge)
-                    self.m += 1
-                    if x not in self.graph.keys():
-                        self.graph[x] = []
-                    if y not in self.graph.keys():
-                        self.graph[y] = []
-                    self.graph[x].append((y, cost))
-        file = open(self.filename, "w")
-        file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
-        file.write(str(self.nodes) + '\n')
-        file.write(str(self.edges) + '\n')
-        file.close()
+        if cost >= 0:
+            x = int(id1)
+            y = int(id2)
+            if x < self.n and y < self.n and x != y and x >= 0 and y >= 0:
+                if self.alg == "dijkstra":
+                    new_edge = {'x': x, 'y': y, 'color': (77, 77, 77), 'cost': cost}
+                    new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77), 'cost': cost}
+                else:
+                    new_edge = {'x': x, 'y': y, 'color': (77, 77, 77)}
+                    new_edge_rev = {'x': y, 'y': x, 'color': (77, 77, 77)}
+                if self.tp == "undirected":
+                    if new_edge not in self.edges and new_edge_rev not in self.edges:
+                        self.edges.append(new_edge)
+                        self.m += 1
+                        if x not in self.graph.keys():
+                            self.graph[x] = []
+                        if y not in self.graph.keys():
+                            self.graph[y] = []
+                        self.graph[y].append((x, cost))
+                        self.graph[x].append((y, cost))
+                else:
+                    if new_edge not in self.edges:
+                        self.edges.append(new_edge)
+                        self.m += 1
+                        if x not in self.graph.keys():
+                            self.graph[x] = []
+                        if y not in self.graph.keys():
+                            self.graph[y] = []
+                        self.graph[x].append((y, cost))
+            file = open(self.filename, "w")
+            file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
+            file.write(str(self.nodes) + '\n')
+            file.write(str(self.edges) + '\n')
+            file.close()
 
-    
     def remove_element(self, id):
         x = int(id)
         self.n -= 1
