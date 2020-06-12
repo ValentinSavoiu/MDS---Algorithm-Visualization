@@ -88,6 +88,7 @@ class Controller:
     def full_random(self):
         id = random.randint(0, 2)
         self.choose_algorithm(id, "random.txt")
+        self.viewer.algorithm = id
 
     def cleanup(self, q):
         while not q.empty():
