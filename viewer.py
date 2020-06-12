@@ -324,7 +324,7 @@ class Viewer:
                         self.running = False
                     return True
 
-                if self.oneStep.collidepoint(posi) and self.controller.state == 'stopped':
+                if self.oneStep.collidepoint(posi):
                     self.controller.run_one_step()
 
                 # 1 = faster, -1 = slower
@@ -334,7 +334,7 @@ class Viewer:
                 if self.slow.collidepoint(posi):
                     self.controller.change_speed(1)
                 
-                if self.back.collidepoint(posi):
+                if self.back.collidepoint(posi) and self.controller.state == 'stopped':
                     print("start over requested")
                     self.controller.request_start_over()
                     return False
