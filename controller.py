@@ -21,9 +21,10 @@ class Controller:
 		self.modview_msgs = queue.Queue() # model to viewer communication
 		self.running_msgs = queue.Queue() # central controller <-> model communication
 		self.one_step_msgs = queue.Queue()
-		self.state        = 'stopped'	  # running or paused
+		self.state        = 'stopped'	  # stopped, running or paused
 		self.speeds		  = (0.125, 0.25, 0.5, 1, 2)
 		self.speed_index  = 2
+		self.again = False
 
 	def change_speed(self, direction):
 		if (self.speed_index == 0 and direction < 0) or (self.speed_index == (len(self.speeds) - 1) and direction > 0):
@@ -42,10 +43,29 @@ class Controller:
 		else:
 			raise NotImplementedError("controller.choose_algorithm: Unknown algorithm {}".format(id))
 
+	def request_start_over(self):
+		self.again = True
+
+	def start_over(self):
+		del self.viewer
+		del self.model
+		self.model  	  = Algorithm(self, self.filename)
+		self.viewer 	  = Viewer(self)
+		self.trigger_msgs = queue.Queue() # handler to array worker communication
+		self.cnttrig_msgs = queue.Queue() # central controller to trigger comunication
+		self.viewmod_msgs = queue.Queue() # viewer to model communication
+		self.modview_msgs = queue.Queue() # model to viewer communication
+		self.running_msgs = queue.Queue() # central controller <-> model communication
+		self.one_step_msgs = queue.Queue()
+		self.state        = 'stopped'	  # running or paused
+		self.speeds		  = (0.125, 0.25, 0.5, 1, 2)
+		self.speed_index  = 2
+		self.again = False
+
+
 	def set_source(self, value):
 		print("setting source to {}".format(value))
 		self.model.DS.set_source(value)
-		self.run_algorithm()
 
 	def add_element(self, value, position):
 		self.model.DS.add_element(value, position)
@@ -202,7 +222,9 @@ class Controller:
 		elif isinstance(self.model.DS, Graph):
 			self.viewer.print_graph(self.filename, algRunning)
 			if isinstance(self.model, Dijkstra):
-				self.viewer.print_array("test.txt", algRunning)
+				self.viewer.event_handler(algRunning, None)
+				if self.state != 'stopped':
+					self.viewer.print_array("test.txt", algRunning)
 		else:
 			raise NotImplementedError('idk what you want me to print man')
 
@@ -215,8 +237,11 @@ class Controller:
 
 	def visualize(self):
 		go_on = True
-		self.viewer.print_icons(False)
 		while (go_on):
+			self.viewer.print_icons(False)
+			print(self.state)
+			if self.again == True:
+				break
 			print(threading.active_count())
 			self.print(False)
 			if isinstance(self.model.DS, Vector):
@@ -226,3 +251,6 @@ class Controller:
 			else:
 				raise NotImplementedError('visualize error')
 		self.restore_file()
+		if self.again == True:
+			self.start_over()
+			self.visualize()
