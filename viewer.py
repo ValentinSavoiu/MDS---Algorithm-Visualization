@@ -27,7 +27,7 @@ class Viewer:
         webbrowser.open('https://www.pygame.org/news', new=0, autoraise=True)
 
     def help(self):
-        webbrowser.open('https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/blob/graph_experimental/README.md', new=0, autoraise=True)
+        webbrowser.open('https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/blob/master/README.md', new=0, autoraise=True)
 
     def full_random(self):
         self.menuRunning = False
