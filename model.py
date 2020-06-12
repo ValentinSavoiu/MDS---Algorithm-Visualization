@@ -127,8 +127,8 @@ class Graph(DataStructure):
                         self.m += 1
                         if x not in self.graph.keys():
                             self.graph[x] = []
-                        if y not in self.graph.keys():
-                            self.graph[y] = []
+                        #if y not in self.graph.keys():
+                            #self.graph[y] = []
                         self.graph[x].append((y, cost))
             if self.alg == "bfs":
                 file = open(self.filename, "w")
