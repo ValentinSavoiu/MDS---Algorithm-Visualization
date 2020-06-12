@@ -97,7 +97,7 @@ class Viewer:
         meniu = self.make_menu(bgfunn = self.main_background, dp = True)
         self.algorithm = 0
         meniu.add_button('Start', self.choose_algorithm, meniu)
-        meniu.add_button('Alege aleator', self.full_random)
+        meniu.add_button('Feeling Lucky', self.full_random)
         meniu.add_selector('',
                                [('Bubblesort', 0),
                                 ('BFS', 1),
