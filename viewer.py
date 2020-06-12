@@ -334,6 +334,10 @@ class Viewer:
                 if self.slow.collidepoint(posi):
                     self.controller.change_speed(1)
                 
+                if self.back.collidepoint(posi):
+                    print("start over requested")
+                    self.controller.request_start_over()
+
                 if changeable == None:
                     continue
 
