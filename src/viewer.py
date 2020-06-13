@@ -81,6 +81,7 @@ class Viewer:
 
     def __init__(self, c):
         self.controller = c
+        self.controller.viewer = self
         self.changeable = True
         pygame.init()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -336,7 +337,6 @@ class Viewer:
                     self.controller.change_speed(1)
                 
                 if self.back.collidepoint(posi) and self.controller.state == 'stopped':
-                    print("start over requested")
                     self.controller.request_start_over()
                     return False
 
@@ -474,15 +474,15 @@ class Viewer:
         pygame.quit()
 
     def loop(self, filename, algRunning, changeable = 'vector'):
-        print("visualizer called")
+        #print("visualizer called")
         self.controller.print(algRunning)
         self.running = True
         while (self.running == True):
             go_on = self.event_handler(algRunning, changeable) # returns False if ESC pressed
             if (go_on == False):
-                print("exited visualize loop by ESC")
+                #print("exited visualize loop by ESC")
                 return False
-        print("exited visualize loop by natural causes")
+        #print("exited visualize loop by natural causes")
         return True
 
 if __name__ == "__main__":

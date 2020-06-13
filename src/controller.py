@@ -90,6 +90,9 @@ class Controller:
         self.choose_algorithm(id, "random.txt")
         self.viewer.algorithm = id
 
+    def reverse_array(self):
+        self.model.DS.reverse_array()
+
     def cleanup(self, q):
         while not q.empty():
             q.get()

@@ -177,6 +177,7 @@ class Graph(DataStructure):
                     self.graph[y].append((x, c))
                 else:
                     self.graph[y].append((x, 1))
+        print(self.graph)
         file = open(self.filename, "w")
         file.write(str(self.n) + " " + str(self.m) + " " + str(self.tp) + '\n')
         file.write(str(self.nodes) + '\n')
@@ -275,14 +276,13 @@ class Vector(DataStructure):
             file.close()
     
     def add_element(self,value,position):
-        if self.sz < 10:
-            self.list.insert(position,value)
-            self.sz = self.sz + 1
-            file = open(self.filename, "w")
-            file.write(str(self.sz) + "\n")
-            for i in range(self.sz):
-                file.write("{'content':" + str(self.list[i]) + ", 'color':(100,100,100)}\n")
-            file.close()
+        self.list.insert(position,value)
+        self.sz = self.sz + 1
+        file = open(self.filename, "w")
+        file.write(str(self.sz) + "\n")
+        for i in range(self.sz):
+            file.write("{'content':" + str(self.list[i]) + ", 'color':(100,100,100)}\n")
+        file.close()
     
     def reverse_array(self):
         self.list.reverse()
