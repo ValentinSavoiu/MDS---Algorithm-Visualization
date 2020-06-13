@@ -89,6 +89,12 @@ class Controller:
         id = random.randint(0, 2)
         self.choose_algorithm(id, "random.txt")
         self.viewer.algorithm = id
+<<<<<<< HEAD
+
+    def reverse_array(self):
+        self.model.DS.reverse_array()
+=======
+>>>>>>> 39c6d9105282f51b8b405378bde3851fd2b32c41
 
     def cleanup(self, q):
         while not q.empty():
