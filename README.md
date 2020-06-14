@@ -1,10 +1,6 @@
 **Instalare**
 
-    chmod +x setup.sh 
-    ./setup.sh
-    . ~/.bashrc
-
-Acum programul se poate apela din terminal cu comanda: visualizer.
+Vedeti 'Releases'
 
 **Utilizare**
 
@@ -33,4 +29,4 @@ bugfixing/issues: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualizatio
     
 refactoring: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/commit/af4a86e994d9b9be4b89e645747cfcebfc1e9152
 
-build tool: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/releases/tag/v1.2
+build tool: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/releases/tag/v1.3
