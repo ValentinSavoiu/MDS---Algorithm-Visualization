@@ -27,6 +27,7 @@ bugfixing/issues: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualizatio
     
 refactoring: https://github.com/ValentinSavoiu/MDS---Algorithm-Visualization/commit/af4a86e994d9b9be4b89e645747cfcebfc1e9152
 [Context]: Initial, print_array albea intreg ecranul pentru a desena iconitele si vectorul doar pe 20% din el
+
 [Refactoring]: Am impartit ecranul in 4 zone. 2 zone pentru array-uri, o zona pentru iconite si o zona pentru graf. Am creat functiile print_icons, clear_array, clear_graph, clear_icons si am modificat functia print_array care se ocupa, fiecare, de bucatile lor din ecran. In plus, zona din ecran care ar trebui ocupata de aceste elemente este calculata acum la initializarea viewer-ului si doar citita de aceste functii, ceea ce distruge orice posibilitate de coliziune. 
 Functionalitatea viewerului a ramas identica (este apelat identic de controller), dar am deschis portile pentru adaugarea unor features fundamentale, precum vizualizarea simultana a unui vector si un graf,
 
