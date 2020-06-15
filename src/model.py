@@ -164,11 +164,11 @@ class Graph(DataStructure):
             y = int(edge['y'])
             if x not in self.graph.keys():
                 self.graph[x] = []
-                if 'cost' in edge.keys():
-                    c = int(edge['cost'])
-                    self.graph[x].append((y, c))
-                else:
-                    self.graph[x].append((y, 1))
+            if 'cost' in edge.keys():
+                c = int(edge['cost'])
+                self.graph[x].append((y, c))
+            else:
+                self.graph[x].append((y, 1))
             if self.tp == "undirected":
                 if y not in self.graph.keys():
                     self.graph[y] = []
@@ -215,11 +215,11 @@ class Graph(DataStructure):
             y = int(edge['y'])
             if x not in self.graph.keys():
                 self.graph[x] = []
-                if 'cost' in edge.keys():
-                    c = int(edge['cost'])
-                    self.graph[x].append((y, c))
-                else:
-                    self.graph[x].append((y, 1))
+            if 'cost' in edge.keys():
+                c = int(edge['cost'])
+                self.graph[x].append((y, c))
+            else:
+                self.graph[x].append((y, 1))
             if self.tp == "undirected":
                 if y not in self.graph.keys():
                     self.graph[y] = []
